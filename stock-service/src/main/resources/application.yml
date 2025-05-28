@@ -1,0 +1,38 @@
+server.port: 8082
+spring:
+  application.name: stock-service
+
+  # --- Postgres wiring ---
+  datasource:
+    url: jdbc:postgresql://localhost:5433/stock-db
+    username: user
+    password: user
+    driver-class-name: org.postgresql.Driver
+
+  # --- JPA ---
+  jpa:
+    hibernate:
+      ddl-auto: validate # schema managed by Liquibase
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- Liquibase wiring ---
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+    enabled: true
+    default-schema: public
+
+  # --- Kafka wiring ---
+  kafka:
+    bootstrap-servers: localhost:29092 # change to kafka:9092 in Docker/K8s
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      # allow any package for JsonDeserializer
+      spring.json.trusted.packages: '*'

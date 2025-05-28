@@ -1,0 +1,25 @@
+plugins {
+    id 'org.springframework.boot' version '3.4.5' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+allprojects {
+    group   = 'com.stepanov'
+    version = '0.1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'                    // every module gets Java plugin
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+    test {
+        useJUnitPlatform()
+    }
+}

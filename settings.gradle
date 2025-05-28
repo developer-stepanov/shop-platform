@@ -1,0 +1,5 @@
+rootProject.name = 'shop-platform'
+include 'library'
+include 'gateway-service'
+include 'order-service'
+include 'stock-service'

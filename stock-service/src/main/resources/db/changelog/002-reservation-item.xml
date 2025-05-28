@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="002-reservation-item" author="stepanov">
+        <createTable tableName="reservation_items">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="order_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sku" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="qty" type="numeric(19,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="reservation_status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="reserved_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- composite unique key (order_id, sku) -->
+        <addUniqueConstraint
+                tableName="reservation_items"
+                columnNames="order_id, sku"
+                constraintName="uk_order_sku"/>
+
+        <!-- optional index to speed look-ups by order_id -->
+        <createIndex
+                tableName="reservation_items"
+                indexName="idx_reservation_order_id">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

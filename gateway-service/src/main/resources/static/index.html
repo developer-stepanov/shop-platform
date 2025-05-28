@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Order demo</title>
+
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
+
+    <style>
+        body { background:#fafafa; }
+        .container { width: 80%; margin: 0 auto;}
+        #log       { white-space:pre-wrap; }
+        .log-pane  { max-height:18rem; overflow:auto; }
+        .order-pane{ max-height:22rem; overflow:auto; }
+
+        /* ---------- status chips ---------- */
+        .chip.status-chip{color:#fff;font-weight:500}
+        .pending-status   { background:#ffb300; }
+        .confirmed-status { background:#2196f3; }
+        .completed-status { background:#2e7d32; }
+        .cancelled-status { background:#c62828; }
+        .unknown-status   { background:#757575; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h4 class="center-align">Products</h4>
+
+    <!-- cards rendered here -->
+    <div id="productCards" class="row"></div>
+
+    <div class="section center">
+        <a id="makeOrderBtn" class="waves-effect waves-light btn-large">MAKE&nbsp;ORDER</a>
+    </div>
+
+    <!-- Orders table -->
+    <div class="card white">
+        <div class="card-content order-pane">
+            <span class="card-title">Orders</span>
+            <table class="highlight responsive-table">
+                <thead>
+                <tr>
+                    <th>Client Req&nbsp;ID</th>
+                    <th>Order&nbsp;ID</th>
+                    <th>Items (sku×qty)</th>
+                    <th class="right-align">Price</th>
+                    <th>Status</th>
+                    <th style="min-width:120px">Details</th>
+                </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card white">
+        <div class="card-content log-pane">
+            <span class="card-title">Log events</span>
+            <pre id="log" class="grey-text text-darken-2"></pre>
+        </div>
+    </div>
+</div>
+
+<!-- Libs -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script>
+    // ----------- CONFIG -----------
+    const GET_PRODUCTS_DEST = '/app/get-product-items';  // request destination
+
+    // ----------- STATE -----------
+    const ordersIndex = new Map(); // orderId => { clientRequestId, orderId, orderItems, price, orderStatus, details }
+
+    // ----------- WEBSOCKET --------
+    const sock  = new SockJS('/ws');
+    const stomp = Stomp.over(sock);
+
+    stomp.connect({}, () => {
+
+        // Subscribe *once* to all events
+        stomp.subscribe('/topic/events', msg => {
+            const type = msg.headers['event-type'] || 'UNKNOWN';
+
+            try {
+                const body = JSON.parse(msg.body);
+
+                /* ---------- 1. PRODUCT LIST ---------- */
+                const products =
+                Array.isArray(body)             ? body :
+                Array.isArray(body.items)        ? body.items :
+                null;
+
+                if (products && products.length && products[0].sku) {
+                    renderProducts(products);
+                }
+
+                /* ---------- 2. ORDER PRICE OR AGGREGATE EVENTS ---------- */
+                if (body && body.orderId) {
+                    if (body.unitPrice !== undefined && body.sku) {
+                        // OrderPriceUpdate {orderId, sku, unitPrice}
+                        applyPriceUpdate(body);
+                    } else if (body.orderStatus && Object.keys(body).length === 2) {
+                        // OrderStatusUpdate {orderId, orderStatus, details?}
+                        updateOrderStatus(body);
+                    } else {
+                        // order aggregate message → create or merge full order state
+                        addOrUpdateOrder(body);
+                    }
+                }
+
+                log(`[${type}] ${msg.body}`);
+
+            } catch (e) { /* ignore non-JSON */ }
+
+        });
+
+        /* ---------- Request initial product list ---------- */
+        stomp.send(GET_PRODUCTS_DEST, {}, '');
+    });
+
+    // ----------- UI ---------------
+    document.addEventListener('DOMContentLoaded', () => {
+        /* products arrive via STOMP – no REST fetch needed */
+        document.getElementById('makeOrderBtn').addEventListener('click', makeOrder);
+    });
+
+    function renderProducts(products){
+        const container = document.getElementById('productCards');
+        container.innerHTML = '';
+        products.forEach(p => {
+            const col = document.createElement('div');
+            col.className = 'col s12 m6 l4';
+            col.innerHTML = `
+                <div class="card hoverable">
+                    <div class="card-content">
+                        <span class="card-title">${p.name}</span>
+                        <p>${p.description ?? ''}</p>
+                        <h6 class="teal-text">€ ${Number(p.unitPrice ?? p.price).toFixed(2)}</h6>
+                    </div>
+                    <div class="card-action">
+                        <label>
+                            <input type="checkbox" class="filled-in product-checkbox" value="${p.sku}" />
+                            <span>Add to basket</span>
+                        </label>
+                    </div>
+                </div>`;
+            container.appendChild(col);
+        });
+    }
+
+    function makeOrder(){
+        const selectedItems = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+                                   .map(cb => ({ sku: cb.value, qty: 1 }));
+        if(selectedItems.length === 0){
+            M.toast({html:'Please select at least one product 🛒'});
+            return;
+        }
+        stomp.send('/app/make-order', {}, JSON.stringify(selectedItems));
+        M.toast({html:`Order sent with ${selectedItems.length} product(s)`});
+    }
+
+    // ---------- Orders table ---------
+    function addOrUpdateOrder(order){
+        // preserve previously accumulated price if not present in event
+        const existing = ordersIndex.get(order.orderId) || {};
+        const merged = { ...existing, ...order };
+        ordersIndex.set(order.orderId, merged);
+        renderOrderRow(merged);
+    }
+
+    function applyPriceUpdate(update){
+        const order = ordersIndex.get(update.orderId);
+        if(!order){ return; }
+        // find qty for the sku in this order
+        const itemsArr = order.orderItems || order.items || order.products || order.skus || [];
+        const item = itemsArr.find(i => i.sku === update.sku);
+        if(!item){ return; }
+        const qty = item.qty ?? 1;
+        const add = Number(update.unitPrice) * qty;
+        order.price = Number(order.price || 0) + add;
+        renderOrderRow(order);
+    }
+
+    function updateOrderStatus({orderId, orderStatus, details}){
+        const order = ordersIndex.get(orderId);
+        if(!order){ return; }
+        order.orderStatus = orderStatus;
+        renderOrderRow(order); // rerender just this row
+    }
+
+    function renderOrderRow(order){
+        const tbody = document.getElementById('ordersBody');
+        let row = document.getElementById('o-'+order.orderId);
+
+        const itemsArr = order.orderItems || order.items || order.products || order.skus || [];
+        const itemsStr = Array.isArray(itemsArr) ? itemsArr.map(i => `${i.sku}×${i.qty}`).join(', ') : '';
+        const priceStr = order.price == null ? '' : `€ ${Number(order.price).toFixed(2)}`;
+        const detailsBox = getDetailsChip(order.details);
+
+        if(!row){
+            row = document.createElement('tr');
+            row.id = 'o-'+order.orderId;
+            row.innerHTML = `<td></td><td></td><td></td><td class="right-align"></td><td></td><td></td>`;
+            tbody.prepend(row);
+        }
+        const cells = row.children;
+        cells[0].textContent = order.clientRequestId ?? '';
+        cells[1].textContent = order.orderId;
+        cells[2].textContent = itemsStr;
+        cells[3].textContent = priceStr;
+        cells[4].innerHTML  = getStatusChip(order.orderStatus);
+        cells[5].innerHTML = detailsBox; // render details
+    }
+
+    function getStatusChip(status){
+        if(!status){ return ''; }
+        const cls = (status || 'unknown').toLowerCase() + '-status';
+        return `<span class="chip status-chip ${cls}">${status}</span>`;
+    }
+
+    function getDetailsChip(details){
+        if(!details){ return ''; }
+        // replace underscores with spaces, convert to lower-case then capitalise first letter
+        const human = details.replace(/_/g,' ').toLowerCase();
+        const pretty = human.charAt(0).toUpperCase() + human.slice(1);
+        return `<span class="chip details-chip">${pretty}</span>`;
+    }
+
+    // ---------- Log helper ----------
+    function log(message){
+        const pre = document.getElementById('log');
+        pre.textContent += message + "\n\n";
+    }
+</script>
+</body>
+</html>

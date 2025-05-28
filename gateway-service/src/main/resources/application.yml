@@ -1,0 +1,17 @@
+server.port: 8080
+spring:
+  application.name: gateway-service
+
+  # --- Kafka wiring ---
+  kafka:
+    bootstrap-servers: localhost:29092      # change to kafka:9092 in Docker/K8s
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      # allow any package for JsonDeserializer
+      spring.json.trusted.packages: '*'

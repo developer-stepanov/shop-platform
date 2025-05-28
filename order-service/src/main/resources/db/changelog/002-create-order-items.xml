@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="002-create-order-items" author="stepanov">
+
+        <!-- table -->
+        <createTable tableName="order_items">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="order_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sku" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="qty" type="integer">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="unit_price" type="numeric(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- FK to orders -->
+        <addForeignKeyConstraint
+                constraintName="fk_order_items_order"
+                baseTableName="order_items"
+                baseColumnNames="order_id"
+                referencedTableName="orders"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <!-- index for fast look-ups -->
+        <createIndex
+                indexName="idx_order_items_order_id"
+                tableName="order_items">
+            <column name="order_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

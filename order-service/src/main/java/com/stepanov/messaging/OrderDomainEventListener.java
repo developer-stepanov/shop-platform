@@ -3,9 +3,13 @@ package com.stepanov.messaging;
 import com.stepanov.kafka.events.OrderCancelled;
 import com.stepanov.kafka.events.OrderPriceUpdate;
 import com.stepanov.kafka.events.OrderReserved;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.kafka.core.KafkaTemplate;
+
 import org.springframework.stereotype.Component;
+
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 

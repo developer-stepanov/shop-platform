@@ -2,16 +2,23 @@ package com.stepanov.service;
 
 import com.stepanov.entity.ReservationItemEntity;
 import com.stepanov.entity.StockItemEntity;
+
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.enums.ReservationStatus;
+
 import com.stepanov.exceptions.OutOfStockException;
+
 import com.stepanov.kafka.events.OrderForStock;
 import com.stepanov.kafka.events.OrderReserved;
 import com.stepanov.kafka.events.OutOfStock;
+
 import com.stepanov.messaging.StockEventsPublisher;
+
 import com.stepanov.repository.ReservationRepository;
 import com.stepanov.repository.StockRepository;
+
 import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +47,6 @@ public class StockService {
                publisher.publishOutOfStock(OutOfStock.builder().orderId(evt.orderId()).build());
                String exceptionMsg = String.format("%s has less then %s items", stockItem.getSku(), itemsToReserve);
                throw new OutOfStockException(exceptionMsg);
-//               return;
            }
 
            final int itemsLeft = stockItem.getAvailableQty() - itemsToReserve;

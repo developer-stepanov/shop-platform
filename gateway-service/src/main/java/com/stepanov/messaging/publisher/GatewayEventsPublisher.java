@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.stepanov.kafka.topics.KafkaTopics.*;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_CREATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.GIVE_ITEMS_FOR_SELL_TOPIC;
 
 @Service
 @AllArgsConstructor

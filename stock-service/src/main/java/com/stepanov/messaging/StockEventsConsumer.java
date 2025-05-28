@@ -1,13 +1,20 @@
 package com.stepanov.messaging;
 
+import com.stepanov.kafka.events.GiveItemsForSell;
+import com.stepanov.kafka.events.ItemsForSell;
+import com.stepanov.kafka.events.OrderForStock;
+import com.stepanov.kafka.events.OrderItem;
+import com.stepanov.kafka.events.OrderPriceUpdate;
+
 import com.stepanov.entity.StockItemEntity;
 import com.stepanov.exceptions.OutOfStockException;
-import com.stepanov.kafka.events.*;
 import com.stepanov.mapper.StockMapper;
 import com.stepanov.repository.StockRepository;
 import com.stepanov.service.StockService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

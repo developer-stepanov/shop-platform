@@ -1,20 +1,31 @@
 package com.stepanov.messaging;
 
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_CREATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_PRICE_UPDATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_RESERVED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.OUT_OF_STOCK_TOPIC;
+
 import com.stepanov.entity.OrderEntity;
 import com.stepanov.enums.OrderDetails;
-import com.stepanov.kafka.events.*;
+import com.stepanov.kafka.events.CreateOrder;
+import com.stepanov.kafka.events.OrderAccepted;
+import com.stepanov.kafka.events.OrderForStock;
+import com.stepanov.kafka.events.OrderPriceUpdate;
+import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.OutOfStock;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.repository.OrderRepository;
+
 import lombok.AllArgsConstructor;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
+
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
-import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
 @AllArgsConstructor
@@ -34,23 +45,9 @@ public class OrderEventsConsumer {
         OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(evt.clientRequestId(), orderEntity);
         OrderForStock orderForStock = OrderMapper.toOrderForStock(orderEntity);
 
-        /*
-            Emit event to Gateway service
-         */
         orderEventsPublisher.publishOrderAccepted(orderAccepted);
-
-        /*
-            Emit event to Stock service
-         */
         orderEventsPublisher.publishOrderForStock(orderForStock);
-
-        System.out.println("EVENT HAS BEEN RECEIVED: " + evt + ", clientRequestId: " + clientRequestId);
     }
-
-//    @KafkaListener(topics = ORDER_FOR_STOCK_TOPIC)
-//    public void onOrderForStockEvent(OrderForStock event, @Header(KafkaHeaders.RECEIVED_KEY) String sessionId) {
-//        System.out.println("EVENT HAS BEEN RECEIVED: " + event + ", sessionId " + sessionId);
-//    }
 
     @KafkaListener(topics = ORDER_PRICE_UPDATED_TOPIC)
     @Transactional

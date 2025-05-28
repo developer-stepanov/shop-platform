@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import static com.stepanov.kafka.topics.KafkaTopics.*;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_PRICE_UPDATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ITEMS_FOR_SELL_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_RESERVED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.OUT_OF_STOCK_TOPIC;
 
 @Component
 @AllArgsConstructor

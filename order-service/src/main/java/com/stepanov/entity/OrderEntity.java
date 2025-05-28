@@ -6,8 +6,25 @@ import com.stepanov.enums.OrderStatus;
 import com.stepanov.kafka.events.OrderCancelled;
 import com.stepanov.kafka.events.OrderPriceUpdate;
 import com.stepanov.kafka.events.OrderReserved;
-import jakarta.persistence.*;
-import lombok.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
@@ -58,8 +75,6 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
             fetch = FetchType.LAZY)
     @Builder.Default
     private List<OrderItemEntity> items = new ArrayList<>();
-
-//    @Transient private final List<Object> domainEvents = new ArrayList<>();
 
     @PrePersist void onCreate() {
         createdAt = updatedAt = Instant.now();
@@ -112,15 +127,5 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
         // throw exception order is already in status cancelled
 
     }
-
-//    @DomainEvents
-//    public Collection<Object> events() {
-//        return this.domainEvents;
-//    }
-//
-//    @AfterDomainEventPublication
-//    public void clearEvents() {
-//        this.domainEvents.clear();
-//    }
 
 }

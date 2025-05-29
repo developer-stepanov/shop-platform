@@ -4,6 +4,7 @@ import com.stepanov.kafka.events.OrderCancelled;
 import com.stepanov.kafka.events.OrderPriceUpdate;
 import com.stepanov.kafka.events.OrderReserved;
 
+import com.stepanov.scheduler.PaymentTimeoutScheduler;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.kafka.core.KafkaTemplate;

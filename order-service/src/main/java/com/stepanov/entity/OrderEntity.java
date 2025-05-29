@@ -7,6 +7,7 @@ import com.stepanov.kafka.events.OrderCancelled;
 import com.stepanov.kafka.events.OrderPriceUpdate;
 import com.stepanov.kafka.events.OrderReserved;
 
+import com.stepanov.kafka.events.PayUntilEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
@@ -59,6 +60,9 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
     @Column(name = "customer_id")
     private UUID customerId;
 
+    @Column(name = "pay_until")
+    private Instant payUntil;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "cancel_reason")
     private OrderDetails cancelReason;
@@ -97,7 +101,7 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
                             .orderId(this.id)
                             .sku(sku)
                             .unitPrice(unitPrice)
-                        .build());
+                            .build());
     }
 
     public void updateOrderStatus(OrderStatus newStatus) {
@@ -108,6 +112,15 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
         registerEvent(OrderReserved.builder()
                                 .orderId(this.id)
                                 .orderStatus(this.status)
+                                .build());
+    }
+
+    public void applyPayUntil(Instant payUntil) {
+        this.setPayUntil(payUntil);
+
+        registerEvent(PayUntilEvent.builder()
+                            .orderId(this.id)
+                            .payUntil(this.payUntil)
                             .build());
     }
 
@@ -121,7 +134,7 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
                                         .orderId(this.id)
                                         .orderStatus(this.status)
                                         .details(this.cancelReason)
-                                    .build());
+                                        .build());
         }
 
         // throw exception order is already in status cancelled

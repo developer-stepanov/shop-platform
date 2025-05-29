@@ -23,6 +23,16 @@ spring:
     enabled: true
     default-schema: public
 
+  # --- Quartz wiring ---
+  quartz:
+    # Persist jobs & triggers in the database
+    job-store-type: jdbc
+    jdbc:
+      # to not run the bundled DDL script every time
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
   # --- Kafka wiring ---
   kafka:
     bootstrap-servers: localhost:29092      # change to kafka:9092 in Docker/K8s

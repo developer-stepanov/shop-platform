@@ -22,4 +22,6 @@ public class KafkaTopics {
 
     public static final String OUT_OF_STOCK_TOPIC = "out-of-stock.v1";
 
+    public static final String STOCK_RELEASE_TOPIC = "release-stock.v1";
+
 }

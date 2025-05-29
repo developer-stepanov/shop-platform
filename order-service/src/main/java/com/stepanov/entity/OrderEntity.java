@@ -7,7 +7,7 @@ import com.stepanov.kafka.events.OrderCancelled;
 import com.stepanov.kafka.events.OrderPriceUpdate;
 import com.stepanov.kafka.events.OrderReserved;
 
-import com.stepanov.kafka.events.PayUntilEvent;
+import com.stepanov.kafka.events.PayUntil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
@@ -118,7 +118,7 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
     public void applyPayUntil(Instant payUntil) {
         this.setPayUntil(payUntil);
 
-        registerEvent(PayUntilEvent.builder()
+        registerEvent(PayUntil.builder()
                             .orderId(this.id)
                             .payUntil(this.payUntil)
                             .build());

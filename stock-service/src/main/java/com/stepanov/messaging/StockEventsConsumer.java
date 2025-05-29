@@ -1,10 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.GiveItemsForSell;
-import com.stepanov.kafka.events.ItemsForSell;
-import com.stepanov.kafka.events.OrderForStock;
-import com.stepanov.kafka.events.OrderItem;
-import com.stepanov.kafka.events.OrderPriceUpdate;
+import com.stepanov.kafka.events.*;
 
 import com.stepanov.entity.StockItemEntity;
 import com.stepanov.exceptions.OutOfStockException;
@@ -65,6 +61,11 @@ public class StockEventsConsumer {
         } catch(OutOfStockException e) {
             log.warn(e.getMessage());
         }
+    }
+
+    @KafkaListener(topics = STOCK_RELEASE_TOPIC)
+    public void onStockReleaseEvent(StockRelease evt) {
+       stockService.releaseStockBy(evt);
     }
 
 }

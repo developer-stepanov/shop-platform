@@ -12,6 +12,7 @@ import com.stepanov.kafka.events.OrderForStock;
 import com.stepanov.kafka.events.OrderReserved;
 import com.stepanov.kafka.events.OutOfStock;
 
+import com.stepanov.kafka.events.StockRelease;
 import com.stepanov.messaging.StockEventsPublisher;
 
 import com.stepanov.repository.ReservationRepository;
@@ -67,5 +68,21 @@ public class StockService {
                                                     .orderId(evt.orderId())
                                                     .orderStatus(OrderStatus.RESERVED)
                                                     .build());
+    }
+
+    @Transactional
+    public void releaseStockBy(StockRelease evt) {
+        evt.orderItems().forEach(it -> {
+            // Pessimistic lock – prevents oversell
+            StockItemEntity stockItem = stockRepository.lockStockItemBySku(it.sku());
+
+            final int itemsToRelease = it.qty();
+            final int updateByQty = stockItem.getAvailableQty() + itemsToRelease;
+
+            stockItem.setAvailableQty(updateByQty);
+
+            ReservationItemEntity reservationItem = reservationRepository.findByOrderIdAndSku(evt.orderId(), it.sku());
+            reservationItem.setReservationStatus(ReservationStatus.RELEASED);
+        });
     }
 }

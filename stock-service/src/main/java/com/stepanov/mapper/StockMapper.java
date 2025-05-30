@@ -15,6 +15,7 @@ public class StockMapper {
                                                     .name(it.getName())
                                                     .description(it.getDescription())
                                                     .unitPrice(it.getUnitPrice())
+                                                    .qty(it.getAvailableQty())
                                                     .build())
                                         .toList());
     }

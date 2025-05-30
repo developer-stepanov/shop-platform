@@ -36,7 +36,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("MacBook Pro")
                         .description("Nice laptop!")
                         .unitPrice(new BigDecimal("4500"))
-                        .availableQty(50)
+                        .availableQty(10)
                         .build());
 
         stockRepository.save(
@@ -45,7 +45,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("Iphone 16")
                         .description("Good choice")
                         .unitPrice(new BigDecimal("1100"))
-                        .availableQty(25)
+                        .availableQty(10)
                         .build());
 
         stockRepository.save(
@@ -54,7 +54,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("MacBook Air")
                         .description("Affordable laptop")
                         .unitPrice(new BigDecimal("1500"))
-                        .availableQty(25)
+                        .availableQty(10)
                         .build());
 
         log.info("Finished populating database");

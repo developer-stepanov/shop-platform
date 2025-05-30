@@ -1,5 +1,6 @@
 package com.stepanov.entity;
 
+import com.stepanov.kafka.events.StockItemUpdateQty;
 import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,7 +26,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class StockItemEntity {
+public class StockItemEntity extends AbstractAggregateRoot<StockItemEntity>  {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
@@ -59,6 +61,24 @@ public class StockItemEntity {
 
     @PreUpdate void onUpdate() {
         updatedAt = Instant.now();
+    }
+
+    public void decreaseAvailableQty(int decreaseByQty) {
+        this.availableQty = this.availableQty - decreaseByQty;
+
+        registerEvent(StockItemUpdateQty.builder()
+                                    .sku(this.sku)
+                                    .qty(this.availableQty)
+                                    .build());
+    }
+
+    public void increaseAvailableQty(int increaseByQty) {
+        this.availableQty = this.availableQty + increaseByQty;
+
+        registerEvent(StockItemUpdateQty.builder()
+                                    .sku(this.sku)
+                                    .qty(this.availableQty)
+                                    .build());
     }
 
 }

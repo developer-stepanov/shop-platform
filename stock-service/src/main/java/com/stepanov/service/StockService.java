@@ -50,14 +50,13 @@ public class StockService {
                throw new OutOfStockException(exceptionMsg);
            }
 
-           final int itemsLeft = stockItem.getAvailableQty() - itemsToReserve;
-
-           stockItem.setAvailableQty(itemsLeft);
+           stockItem.decreaseAvailableQty(itemsToReserve);
+           stockRepository.save(stockItem); // to run StockItemDomainEventListener
 
            ReservationItemEntity reservation = ReservationItemEntity.builder()
                                                                    .orderId(evt.orderId())
                                                                    .sku(it.sku())
-                                                                   .qty(new BigDecimal(it.qty()))
+                                                                   .qty(new BigDecimal(itemsToReserve))
                                                                    .reservationStatus(ReservationStatus.RESERVED)
                                                                    .build();
 
@@ -73,13 +72,13 @@ public class StockService {
     @Transactional
     public void releaseStockBy(StockRelease evt) {
         evt.orderItems().forEach(it -> {
-            // Pessimistic lock – prevents oversell
+            // Pessimistic lock ?? do i need it?
             StockItemEntity stockItem = stockRepository.lockStockItemBySku(it.sku());
 
             final int itemsToRelease = it.qty();
-            final int updateByQty = stockItem.getAvailableQty() + itemsToRelease;
 
-            stockItem.setAvailableQty(updateByQty);
+            stockItem.increaseAvailableQty(itemsToRelease);
+            stockRepository.save(stockItem);
 
             ReservationItemEntity reservationItem = reservationRepository.findByOrderIdAndSku(evt.orderId(), it.sku());
             reservationItem.setReservationStatus(ReservationStatus.RELEASED);

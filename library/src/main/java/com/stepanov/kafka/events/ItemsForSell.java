@@ -10,5 +10,6 @@ public record ItemsForSell(List<Item> items) {
     public record Item(String sku,
                        BigDecimal unitPrice,
                        String name,
-                       String description) {}
+                       String description,
+                       long qty) {}
 }

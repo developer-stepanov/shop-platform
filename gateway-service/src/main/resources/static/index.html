@@ -98,7 +98,13 @@
                     renderProducts(products);
                 }
 
-                /* ---------- 2. ORDER PRICE OR AGGREGATE EVENTS ---------- */
+                /* ---------- 2. STOCK ITEM QTY UPDATE ---------- */
+                if(body && typeof body.sku === 'string' && body.qty !== undefined && Object.keys(body).length === 2){
+                    // StockItemUpdateQty {sku, qty}
+                    updateStockQty(body);
+                }
+
+                /* ---------- 3. ORDER PRICE OR AGGREGATE EVENTS ---------- */
                 if (body && body.orderId) {
                     if (body.unitPrice !== undefined && body.sku) {
                         // OrderPriceUpdate {orderId, sku, unitPrice}
@@ -134,12 +140,17 @@
         products.forEach(p => {
             const col = document.createElement('div');
             col.className = 'col s12 m6 l4';
+
+            const qtyText = p.qty == null ? 'n/a' : p.qty;
+            const qtyLabel = `<span class="grey-text">Qty: <span class="product-qty" id="q-${p.sku}">${qtyText}</span></span>`;
+
             col.innerHTML = `
-                <div class="card hoverable">
+                <div class="card hoverable" id="prod-${p.sku}" data-sku="${p.sku}">
                     <div class="card-content">
                         <span class="card-title">${p.name}</span>
                         <p>${p.description ?? ''}</p>
                         <h6 class="teal-text">€ ${Number(p.unitPrice ?? p.price).toFixed(2)}</h6>
+                        ${qtyLabel}
                     </div>
                     <div class="card-action">
                         <label>
@@ -150,6 +161,14 @@
                 </div>`;
             container.appendChild(col);
         });
+    }
+
+    /** Handle real‑time StockItemUpdateQty {sku, qty} */
+    function updateStockQty({sku, qty}){
+        const qtySpan = document.getElementById('q-'+sku);
+        if(qtySpan){
+            qtySpan.textContent = qty;
+        }
     }
 
     function makeOrder(){

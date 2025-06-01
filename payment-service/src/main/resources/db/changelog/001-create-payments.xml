@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="001-create-payments" author="stepanov">
+        <createTable tableName="payments">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="order_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="total_payment" type="numeric(10,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="currency" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="payment_status" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="payment_method" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stripe_session_id" type="varchar"/>
+
+            <column name="stripe_payment_intent" type="varchar"/>
+
+            <column name="stripe_checkout_url" type="varchar"/>
+
+            <column name="fail_reason" type="varchar"/>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

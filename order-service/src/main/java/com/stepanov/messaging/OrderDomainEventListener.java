@@ -15,6 +15,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.stepanov.kafka.topics.KafkaTopics.ORDER_UPDATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_CREATED_TOPIC;
 
 @Component
 @RequiredArgsConstructor
@@ -32,7 +33,8 @@ public class OrderDomainEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void publishOrderReserved(OrderReserved evt) {
-        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt); // fire -> gateway -> UI
+        kafkaTemplate.send(PAYMENT_CREATED_TOPIC, evt.orderId().toString(), evt); // fire -> payment
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

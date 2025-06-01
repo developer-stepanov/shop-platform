@@ -3,11 +3,8 @@ package com.stepanov.entity;
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.OrderCancelled;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.*;
 
-import com.stepanov.kafka.events.PayUntil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
@@ -39,7 +36,7 @@ import java.util.*;
 @Builder
 @NoArgsConstructor @AllArgsConstructor
 //extends AbstractAggregateRoot to use @DomainEvents aggregator to send it to OrderDomainEventListener
-public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
+    public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)   // Hibernate generates UUID-v7
@@ -112,6 +109,10 @@ public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
         registerEvent(OrderReserved.builder()
                                 .orderId(this.id)
                                 .orderStatus(this.status)
+                                .paymentDetails(PaymentDetails.builder()
+                                        .totalPayment(this.totalAmount)
+                                        .currency(this.currency)
+                                        .build())
                                 .build());
     }
 

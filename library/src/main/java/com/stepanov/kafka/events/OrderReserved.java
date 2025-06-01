@@ -7,5 +7,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record OrderReserved(UUID orderId, OrderStatus orderStatus) {
+public record OrderReserved(UUID orderId, OrderStatus orderStatus, PaymentDetails paymentDetails) {
 }

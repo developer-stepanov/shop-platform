@@ -26,4 +26,8 @@ public class KafkaTopics {
 
     public static final String STOCK_ITEM_UPDATE_TOPIC = "stock-item-update.v1";
 
+    public static final String PAYMENT_CREATED_TOPIC = "payment-created.v1";
+
+    public static final String PAYMENT_LINK_TOPIC = "payment-link.v1";
+
 }

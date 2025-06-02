@@ -30,4 +30,8 @@ public class KafkaTopics {
 
     public static final String PAYMENT_LINK_TOPIC = "payment-link.v1";
 
+    public static final String PAYMENT_SUCCESS_TOPIC = "payment-success.v1";
+
+    public static final String PAYMENT_FAILED_TOPIC = "payment-failed.v1";
+
 }

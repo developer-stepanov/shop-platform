@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Order demo</title>
+    <title>Order demo – PAY button removed on Paid or Cancelled</title>
 
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
@@ -19,6 +19,7 @@
         .pending-status   { background:#ffb300; }
         .confirmed-status { background:#2196f3; }
         .completed-status { background:#2e7d32; }
+        .paid-status      { background:#2e7d32; }
         .cancelled-status { background:#c62828; }
         .unknown-status   { background:#757575; }
     </style>
@@ -42,7 +43,6 @@
             <table class="highlight responsive-table">
                 <thead>
                 <tr>
-                    <th>Client Req&nbsp;ID</th>
                     <th>Order&nbsp;ID</th>
                     <th>Items (sku×qty)</th>
                     <th class="right-align">Price</th>
@@ -70,87 +70,68 @@
 
 <script>
     // ----------- CONFIG -----------
-    const GET_PRODUCTS_DEST = '/app/get-product-items';  // request destination
+    const GET_PRODUCTS_DEST = '/app/get-product-items';
 
     // ----------- STATE -----------
-    const ordersIndex = new Map(); // orderId => { clientRequestId, orderId, orderItems, price, orderStatus, details }
+    // orderId → { clientRequestId, orderId, orderItems, price, orderStatus, details, paymentLink }
+    const ordersIndex = new Map();
 
     // ----------- WEBSOCKET --------
     const sock  = new SockJS('/ws');
     const stomp = Stomp.over(sock);
 
     stomp.connect({}, () => {
-
-        // Subscribe *once* to all events
         stomp.subscribe('/topic/events', msg => {
             const type = msg.headers['event-type'] || 'UNKNOWN';
-
             try {
                 const body = JSON.parse(msg.body);
 
-                /* ---------- 1. PRODUCT LIST ---------- */
-                const products =
-                Array.isArray(body)             ? body :
-                Array.isArray(body.items)        ? body.items :
-                null;
+                /* 1️⃣  Product list */
+                const products = Array.isArray(body) ? body : Array.isArray(body?.items) ? body.items : null;
+                if(products?.length && products[0].sku){ renderProducts(products); }
 
-                if (products && products.length && products[0].sku) {
-                    renderProducts(products);
+                /* 2️⃣  Stock update */
+                if(body?.sku && body.qty !== undefined && Object.keys(body).length === 2){ updateStockQty(body); }
+
+                /* 3️⃣  Paid event */
+                if(type === 'OrderPaid' && body.orderId){ applyOrderPaid(body); }
+
+                /* 4️⃣  Price / status / aggregate */
+                if(body?.orderId){
+                    if(body.unitPrice !== undefined && body.sku){ applyPriceUpdate(body); }
+                    else if(body.orderStatus && Object.keys(body).length === 2){ updateOrderStatus(body); }
+                    else { addOrUpdateOrder(body); }
                 }
 
-                /* ---------- 2. STOCK ITEM QTY UPDATE ---------- */
-                if(body && typeof body.sku === 'string' && body.qty !== undefined && Object.keys(body).length === 2){
-                    // StockItemUpdateQty {sku, qty}
-                    updateStockQty(body);
-                }
-
-                /* ---------- 3. ORDER PRICE OR AGGREGATE EVENTS ---------- */
-                if (body && body.orderId) {
-                    if (body.unitPrice !== undefined && body.sku) {
-                        // OrderPriceUpdate {orderId, sku, unitPrice}
-                        applyPriceUpdate(body);
-                    } else if (body.orderStatus && Object.keys(body).length === 2) {
-                        // OrderStatusUpdate {orderId, orderStatus, details?}
-                        updateOrderStatus(body);
-                    } else {
-                        // order aggregate message → create or merge full order state
-                        addOrUpdateOrder(body);
-                    }
-                }
+                /* 5️⃣  Payment link */
+                if(body?.orderId && body.paymentLink){ applyPaymentLink(body); }
 
                 log(`[${type}] ${msg.body}`);
-
-            } catch (e) { /* ignore non-JSON */ }
-
+            } catch {/* non‑JSON */}
         });
 
-        /* ---------- Request initial product list ---------- */
+        // Initial product list
         stomp.send(GET_PRODUCTS_DEST, {}, '');
     });
 
-    // ----------- UI ---------------
+    // ----------- UI -----------
     document.addEventListener('DOMContentLoaded', () => {
-        /* products arrive via STOMP – no REST fetch needed */
         document.getElementById('makeOrderBtn').addEventListener('click', makeOrder);
     });
 
+    /* ---------- Product cards ---------- */
     function renderProducts(products){
         const container = document.getElementById('productCards');
         container.innerHTML = '';
-        products.forEach(p => {
-            const col = document.createElement('div');
-            col.className = 'col s12 m6 l4';
-
-            const qtyText = p.qty == null ? 'n/a' : p.qty;
-            const qtyLabel = `<span class="grey-text">Qty: <span class="product-qty" id="q-${p.sku}">${qtyText}</span></span>`;
-
+        for(const p of products){
+            const col = document.createElement('div'); col.className = 'col s12 m6 l4';
             col.innerHTML = `
                 <div class="card hoverable" id="prod-${p.sku}" data-sku="${p.sku}">
                     <div class="card-content">
                         <span class="card-title">${p.name}</span>
                         <p>${p.description ?? ''}</p>
                         <h6 class="teal-text">€ ${Number(p.unitPrice ?? p.price).toFixed(2)}</h6>
-                        ${qtyLabel}
+                        <span class="grey-text">Qty: <span class="product-qty" id="q-${p.sku}">${p.qty ?? 'n/a'}</span></span>
                     </div>
                     <div class="card-action">
                         <label>
@@ -160,100 +141,76 @@
                     </div>
                 </div>`;
             container.appendChild(col);
-        });
-    }
-
-    /** Handle real‑time StockItemUpdateQty {sku, qty} */
-    function updateStockQty({sku, qty}){
-        const qtySpan = document.getElementById('q-'+sku);
-        if(qtySpan){
-            qtySpan.textContent = qty;
         }
     }
+    function updateStockQty({sku, qty}){ const el = document.getElementById('q-'+sku); if(el) el.textContent = qty; }
 
+    /* ---------- Ordering ---------- */
     function makeOrder(){
-        const selectedItems = Array.from(document.querySelectorAll('.product-checkbox:checked'))
-                                   .map(cb => ({ sku: cb.value, qty: 1 }));
-        if(selectedItems.length === 0){
-            M.toast({html:'Please select at least one product 🛒'});
-            return;
-        }
-        stomp.send('/app/make-order', {}, JSON.stringify(selectedItems));
-        M.toast({html:`Order sent with ${selectedItems.length} product(s)`});
+        const items = [...document.querySelectorAll('.product-checkbox:checked')].map(cb => ({sku:cb.value, qty:1}));
+        if(!items.length){ M.toast({html:'Please select at least one product 🛒'}); return; }
+        stomp.send('/app/make-order', {}, JSON.stringify(items));
+        M.toast({html:`Order sent with ${items.length} product(s)`});
     }
 
-    // ---------- Orders table ---------
+    /* ---------- Order helpers ---------- */
     function addOrUpdateOrder(order){
-        // preserve previously accumulated price if not present in event
-        const existing = ordersIndex.get(order.orderId) || {};
-        const merged = { ...existing, ...order };
+        const merged = {...(ordersIndex.get(order.orderId) || {}), ...order};
+        if(merged.orderStatus?.toUpperCase() === 'CANCELLED'){ delete merged.paymentLink; }
         ordersIndex.set(order.orderId, merged);
         renderOrderRow(merged);
     }
-
     function applyPriceUpdate(update){
-        const order = ordersIndex.get(update.orderId);
-        if(!order){ return; }
-        // find qty for the sku in this order
+        const order = ordersIndex.get(update.orderId); if(!order) return;
         const itemsArr = order.orderItems || order.items || order.products || order.skus || [];
-        const item = itemsArr.find(i => i.sku === update.sku);
-        if(!item){ return; }
-        const qty = item.qty ?? 1;
-        const add = Number(update.unitPrice) * qty;
-        order.price = Number(order.price || 0) + add;
+        const itm = itemsArr.find(i => i.sku === update.sku); if(!itm) return;
+        order.price = Number(order.price || 0) + Number(update.unitPrice)*(itm.qty ?? 1);
+        renderOrderRow(order);
+    }
+    function updateOrderStatus({orderId, orderStatus}){
+        const order = ordersIndex.get(orderId) || {orderId};
+        order.orderStatus = orderStatus;
+        if(orderStatus?.toUpperCase() === 'CANCELLED'){ delete order.paymentLink; }
+        ordersIndex.set(orderId, order);
+        renderOrderRow(order);
+    }
+    function applyPaymentLink({orderId, paymentLink}){
+        const order = ordersIndex.get(orderId) || {orderId};
+        const status = order.orderStatus?.toUpperCase() || '';
+        if(status !== 'PAID' && status !== 'CANCELLED'){ order.paymentLink = paymentLink; }
+        ordersIndex.set(orderId, order);
+        renderOrderRow(order);
+    }
+    function applyOrderPaid({orderId, orderStatus}){
+        const order = ordersIndex.get(orderId) || {orderId};
+        order.orderStatus = orderStatus;
+        delete order.paymentLink;
+        ordersIndex.set(orderId, order);
         renderOrderRow(order);
     }
 
-    function updateOrderStatus({orderId, orderStatus, details}){
-        const order = ordersIndex.get(orderId);
-        if(!order){ return; }
-        order.orderStatus = orderStatus;
-        renderOrderRow(order); // rerender just this row
-    }
-
+    /* ---------- Rendering ---------- */
     function renderOrderRow(order){
         const tbody = document.getElementById('ordersBody');
         let row = document.getElementById('o-'+order.orderId);
+        if(!row){ row = document.createElement('tr'); row.id = 'o-'+order.orderId; row.innerHTML = '<td></td><td></td><td class="right-align"></td><td></td><td></td>'; tbody.prepend(row); }
 
         const itemsArr = order.orderItems || order.items || order.products || order.skus || [];
-        const itemsStr = Array.isArray(itemsArr) ? itemsArr.map(i => `${i.sku}×${i.qty}`).join(', ') : '';
-        const priceStr = order.price == null ? '' : `€ ${Number(order.price).toFixed(2)}`;
-        const detailsBox = getDetailsChip(order.details);
+        const itemsStr = itemsArr.map(i=>`${i.sku}×${i.qty}`).join(', ');
 
-        if(!row){
-            row = document.createElement('tr');
-            row.id = 'o-'+order.orderId;
-            row.innerHTML = `<td></td><td></td><td></td><td class="right-align"></td><td></td><td></td>`;
-            tbody.prepend(row);
-        }
         const cells = row.children;
-        cells[0].textContent = order.clientRequestId ?? '';
-        cells[1].textContent = order.orderId;
-        cells[2].textContent = itemsStr;
-        cells[3].textContent = priceStr;
-        cells[4].innerHTML  = getStatusChip(order.orderStatus);
-        cells[5].innerHTML = detailsBox; // render details
+        cells[0].textContent = order.orderId;
+        cells[1].textContent = itemsStr;
+        cells[2].textContent = order.price != null ? `€ ${Number(order.price).toFixed(2)}` : '';
+        cells[3].innerHTML  = getStatusChip(order.orderStatus);
+        cells[4].innerHTML  = `${getDetailsChip(order.details)} ${getPayButton(order.paymentLink)}`.trim();
     }
+    function getStatusChip(status){ if(!status) return ''; const cls = (status.toLowerCase() || 'unknown')+'-status'; return `<span class="chip status-chip ${cls}">${status}</span>`; }
+    function getDetailsChip(details){ if(!details) return ''; const pretty = details.replace(/_/g,' ').toLowerCase().replace(/^./,c=>c.toUpperCase()); return `<span class="chip details-chip">${pretty}</span>`; }
+    function getPayButton(link){ return link ? `<a href="${link}" target="_blank" class="waves-effect waves-light btn-small green">PAY</a>` : ''; }
 
-    function getStatusChip(status){
-        if(!status){ return ''; }
-        const cls = (status || 'unknown').toLowerCase() + '-status';
-        return `<span class="chip status-chip ${cls}">${status}</span>`;
-    }
-
-    function getDetailsChip(details){
-        if(!details){ return ''; }
-        // replace underscores with spaces, convert to lower-case then capitalise first letter
-        const human = details.replace(/_/g,' ').toLowerCase();
-        const pretty = human.charAt(0).toUpperCase() + human.slice(1);
-        return `<span class="chip details-chip">${pretty}</span>`;
-    }
-
-    // ---------- Log helper ----------
-    function log(message){
-        const pre = document.getElementById('log');
-        pre.textContent += message + "\n\n";
-    }
+    /* ---------- Logger ---------- */
+    function log(msg){ document.getElementById('log').textContent += msg + '\n\n'; }
 </script>
 </body>
 </html>

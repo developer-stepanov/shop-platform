@@ -1,17 +1,7 @@
 package com.stepanov.messaging;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_CREATED_TOPIC;
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_PRICE_UPDATED_TOPIC;
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_RESERVED_TOPIC;
-import static com.stepanov.kafka.topics.KafkaTopics.OUT_OF_STOCK_TOPIC;
-
 import com.stepanov.entity.OrderEntity;
-import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.OrderAccepted;
-import com.stepanov.kafka.events.OrderForStock;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
-import com.stepanov.kafka.events.OutOfStock;
+import com.stepanov.kafka.events.*;
 import com.stepanov.mapper.OrderMapper;
 
 import com.stepanov.service.OrderService;
@@ -23,6 +13,8 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
 @AllArgsConstructor
@@ -61,5 +53,17 @@ public class OrderEventsConsumer {
     @Transactional
     public void onOrderOutOfStock(OutOfStock evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
        orderService.orderOutOfStock(evt);
+    }
+
+    @KafkaListener(topics = PAYMENT_LINK_TOPIC)
+    @Transactional
+    public void onPaymentLink(PaymentLink evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        orderService.paymentLink(evt);
+    }
+
+    @KafkaListener(topics = PAYMENT_SUCCESS_TOPIC)
+    @Transactional
+    public void onPaymentSucceeded(PaymentSuccessful evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        orderService.orderPaymentSucceeded(evt);
     }
 }

@@ -64,6 +64,9 @@ import java.util.*;
     @Column(name = "cancel_reason")
     private OrderDetails cancelReason;
 
+    @Column(name = "payment_link")
+    private String paymentLink;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -142,4 +145,25 @@ import java.util.*;
 
     }
 
+    public void applyPaymentLink(String paymentLink) {
+        if (this.status != OrderStatus.CANCELLED) {
+            this.paymentLink = paymentLink;
+
+            registerEvent(OrderPaymentLinkUpdate.builder()
+                                .orderId(this.id)
+                                .paymentLink(this.paymentLink)
+                                .build());
+        }
+    }
+
+    public void paid() {
+        if (this.status != OrderStatus.CANCELLED) {
+            this.status = OrderStatus.PAID;
+
+            registerEvent(OrderPaid.builder()
+                    .orderId(this.id)
+                    .orderStatus(this.status)
+                    .build());
+        }
+    }
 }

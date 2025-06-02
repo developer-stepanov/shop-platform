@@ -1,8 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.OrderCancelled;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.*;
 
 import com.stepanov.scheduler.PaymentTimeoutScheduler;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +37,16 @@ public class OrderDomainEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void publishOrderCancelled(OrderCancelled evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void publishOrderPaymentLinkUpdate(OrderPaymentLinkUpdate evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void publishOrderPaid(OrderPaid evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 }

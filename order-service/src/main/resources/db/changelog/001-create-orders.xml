@@ -26,6 +26,8 @@
 
             <column name="cancel_reason" type="varchar(50)"/>
 
+            <column name="payment_link" type="varchar"/>
+
             <column name="customer_id" type="uuid"/>
 
             <column name="pay_until" type="timestamp"/>

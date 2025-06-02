@@ -36,7 +36,8 @@ public class PaymentService {
             session = Session.create(
                     SessionCreateParams.builder()
                             .setMode(SessionCreateParams.Mode.PAYMENT)
-                            .setSuccessUrl("http://localhost:9999")
+                            .setSuccessUrl("http://localhost:9999") // change to gateway controller to show that
+                                                                    // payment is successful
                             .putMetadata(METADATA_ORDER_ID, paymentItem.getOrderId().toString())
                             .addLineItem(SessionCreateParams.LineItem.builder()
                                     .setQuantity(1L)
@@ -51,18 +52,28 @@ public class PaymentService {
                             .build()
             );
         } catch (StripeException e) {
-            log.error("Payment session can not created for orderId: {}", paymentItem.getOrderId());
+            log.error("Stripe payment session can not be created for orderId: {}", paymentItem.getOrderId());
         }
 
         return Optional.ofNullable(session);
     }
 
     @Transactional
-    public void updatePaymentItem(PaymentEntity paymentItem, Session session) {
-        paymentItem.setStripeSessionId(session.getId());
-        paymentItem.setStripeCheckoutUrl(session.getUrl());
-        paymentItem.setPaymentStatus(PaymentStatus.LINK_SENT);
-
+    public void updatePaymentItemWithCheckoutLink(PaymentEntity paymentItem, Session session) {
+        paymentItem.updateWithCheckoutLink(session);
         paymentRepository.save(paymentItem);
+    }
+
+    @Transactional
+    public void markPaymentSucceeded(Session session) {
+        paymentRepository.findByStripeSessionId(session.getId()).ifPresent(it -> {
+            if (it.getPaymentStatus() == PaymentStatus.SUCCEEDED) {
+                // log there that webhook calls once again for the same orderId
+                return; // -> idempotent
+            }
+
+            it.markPaymentAsSucceeded(session.getPaymentIntent());
+            paymentRepository.save(it);
+        });
     }
 }

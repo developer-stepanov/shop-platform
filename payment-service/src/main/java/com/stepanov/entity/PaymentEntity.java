@@ -3,6 +3,9 @@ package com.stepanov.entity;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.PaymentMethod;
 import com.stepanov.enums.PaymentStatus;
+import com.stepanov.kafka.events.PaymentLink;
+import com.stepanov.kafka.events.PaymentSuccessful;
+import com.stripe.model.checkout.Session;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -70,5 +73,26 @@ public class PaymentEntity extends AbstractAggregateRoot<PaymentEntity> {
     @PreUpdate
     void onUpdate() {
         updatedAt = Instant.now();
+    }
+
+    public void updateWithCheckoutLink(Session s) {
+        this.setStripeSessionId(s.getId());
+        this.setStripeCheckoutUrl(s.getUrl());
+        this.setPaymentStatus(PaymentStatus.LINK_SENT);
+
+        registerEvent(PaymentLink.builder()
+                            .orderId(this.orderId)
+                            .checkoutUrl(this.stripeCheckoutUrl)
+                            .build());
+    }
+
+    public void markPaymentAsSucceeded(String stripePaymentIntentId) {
+        this.setPaymentStatus(PaymentStatus.SUCCEEDED);
+        this.setStripePaymentIntent(stripePaymentIntentId);
+
+        registerEvent(PaymentSuccessful.builder()
+                                        .orderId(this.orderId)
+                                        .paymentStatus(this.paymentStatus)
+                                        .build());
     }
 }

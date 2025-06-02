@@ -1,8 +1,6 @@
 package com.stepanov.messaging.listener;
 
-import com.stepanov.kafka.events.OrderCancelled;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.*;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -41,6 +39,24 @@ public class OrderUpdatedTopicListener {
 
     @KafkaHandler
     void on(OrderCancelled evt,
+            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+
+        broker.convertAndSend("/topic/events",
+                evt,
+                Map.of("event-type", evt.getClass().getSimpleName()));
+    }
+
+    @KafkaHandler
+    void on(OrderPaymentLinkUpdate evt,
+            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+
+        broker.convertAndSend("/topic/events",
+                evt,
+                Map.of("event-type", evt.getClass().getSimpleName()));
+    }
+
+    @KafkaHandler
+    void on(OrderPaid evt,
             @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
 
         broker.convertAndSend("/topic/events",

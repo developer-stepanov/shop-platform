@@ -2,10 +2,7 @@ package com.stepanov.service;
 
 import com.stepanov.entity.OrderEntity;
 import com.stepanov.enums.OrderDetails;
-import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
-import com.stepanov.kafka.events.OutOfStock;
+import com.stepanov.kafka.events.*;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.repository.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -59,6 +56,26 @@ public class OrderService {
         order.ifPresent(it -> {
             it.cancel(OrderDetails.OUT_OF_STOCK);
             //force to send to OrderDomainEventListener
+            orderRepository.save(it);
+        });
+    }
+
+    @Transactional
+    public void paymentLink(PaymentLink evt) {
+        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
+
+        order.ifPresent(it -> {
+            it.applyPaymentLink(evt.checkoutUrl());
+            orderRepository.save(it);
+        });
+    }
+
+    @Transactional
+    public void orderPaymentSucceeded(PaymentSuccessful evt) {
+        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
+
+        order.ifPresent(it -> {
+            it.paid();
             orderRepository.save(it);
         });
     }

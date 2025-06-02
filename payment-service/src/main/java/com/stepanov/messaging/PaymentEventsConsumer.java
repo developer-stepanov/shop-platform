@@ -29,6 +29,6 @@ public class PaymentEventsConsumer {
         Session stripeSession = paymentService.createCheckoutLink(paymentItem)
                                     .orElseThrow(() -> new EmptyStripeSession("OrderId: " + evt.orderId()));
 
-        paymentService.updatePaymentItem(paymentItem, stripeSession);
+        paymentService.updatePaymentItemWithCheckoutLink(paymentItem, stripeSession);
     }
 }

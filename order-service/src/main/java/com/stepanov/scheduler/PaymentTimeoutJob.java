@@ -51,7 +51,7 @@ public class PaymentTimeoutJob implements Job {
                                                         )
                                                         .toList();
 
-        orderEntity.cancel(OrderDetails.NOT_PAID);
+        orderEntity.applyCanceledStatus(OrderDetails.NOT_PAID);
         orderRepository.save(orderEntity);
 
         orderEventsPublisher.publishStockRelease(StockRelease.builder()

@@ -17,7 +17,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class OrderService {
 
-    private static final long GAP_TO_PAY_MINUTES = 1;
+    private static final long GAP_TO_PAY_MINUTES = 5;
 
     private final OrderRepository orderRepository;
 
@@ -31,20 +31,20 @@ public class OrderService {
         Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
 
         order.ifPresent(it -> {
-            it.applyPrice(evt.sku(), evt.unitPrice());
+            it.applyUnitPriceAndTotalAmount(evt.priceBySkus());
             //force to send to OrderDomainEventListener
             orderRepository.save(it);
         });
     }
 
     @Transactional
-    public void orderReserved(OrderReserved evt) {
+    public void orderReserved(ConfirmationReservation evt) {
         Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
         order.ifPresent(it -> {
             // fire OrderReserved
-            it.updateOrderStatus(evt.orderStatus());
+            it.applyReservedStatus(evt);
             //fire PayUntil
-            it.applyPayUntil(resolvePayUntilTime());
+            it.applyPayUntilTime(resolvePayUntilTime());
             //force to send to OrderDomainEventListener
             orderRepository.save(it);
         });
@@ -54,7 +54,7 @@ public class OrderService {
     public void orderOutOfStock(OutOfStock evt) {
         Optional<OrderEntity> order = orderRepository.findById((evt.orderId()));
         order.ifPresent(it -> {
-            it.cancel(OrderDetails.OUT_OF_STOCK);
+            it.applyCanceledStatus(OrderDetails.OUT_OF_STOCK);
             //force to send to OrderDomainEventListener
             orderRepository.save(it);
         });
@@ -75,7 +75,7 @@ public class OrderService {
         Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
 
         order.ifPresent(it -> {
-            it.paid();
+            it.applyPaidStatus();
             orderRepository.save(it);
         });
     }

@@ -93,33 +93,63 @@ import java.util.*;
         item.setOrderEntity(this);
     }
 
-    public void applyPrice(String sku, BigDecimal unitPrice) {
-        Optional<OrderItemEntity> order = this.items.stream().filter(it -> sku.equals(it.getSku())).findFirst();
-        order.ifPresent(o -> o.setUnitPrice(unitPrice));
+    public void applyUnitPriceAndTotalAmount(List<OrderPriceUpdate.PriceBySku> priceBySkus) {
 
-        registerEvent(OrderPriceUpdate.builder()
+        this.items.forEach(it -> {
+            final String sku = it.getSku();
+            final BigDecimal unitPrice = priceBySkus.stream()
+                                                    .filter(p -> sku.equals(p.sku())).findFirst()
+                                                    .orElseThrow()
+                                                .unitPrice();
+            it.setUnitPrice(unitPrice);
+        });
+
+        this.totalAmount = this.items.stream()
+                                        .map(OrderItemEntity::getUnitPrice)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        registerEvent(OrderTotalAmountUpdated.builder()
                             .orderId(this.id)
-                            .sku(sku)
-                            .unitPrice(unitPrice)
+                            .totalAmount(this.totalAmount.longValue())
                             .build());
     }
 
-    public void updateOrderStatus(OrderStatus newStatus) {
+    public void applyReservedStatus(ConfirmationReservation evt) {
 
-        if (this.status != newStatus)
-            this.status = newStatus;
+        if (evt.orderStatus() == OrderStatus.RESERVED) {
+            this.status = evt.orderStatus();
 
-        registerEvent(OrderReserved.builder()
-                                .orderId(this.id)
-                                .orderStatus(this.status)
-                                .paymentDetails(PaymentDetails.builder()
-                                        .totalPayment(this.totalAmount)
-                                        .currency(this.currency)
-                                        .build())
-                                .build());
+            this.totalAmount = evt.paymentDetails().totalPayment();
+            this.currency = evt.paymentDetails().currency();
+
+            this.items.forEach(it -> {
+                final String sku = it.getSku();
+                final BigDecimal unitPrice = evt.unitPrices().stream()
+                            .filter(p -> sku.equals(p.sku()))
+                            .map(ConfirmationReservation.UnitPrice::unitPrice)
+                            .findFirst().orElseThrow();
+
+                it.setUnitPrice(unitPrice);
+            });
+
+
+            registerEvent(ConfirmationReservation.builder()
+                                        .orderId(this.id)
+                                        .orderStatus(this.status)
+                                        .paymentDetails(PaymentDetails.builder()
+                                                .totalPayment(this.totalAmount)
+                                                .currency(this.currency)
+                                                .build())
+                                        .build());
+
+            registerEvent(OrderTotalAmountUpdated.builder()
+                                        .orderId(this.id)
+                                        .totalAmount(this.totalAmount.longValue())
+                                        .build());
+        }
     }
 
-    public void applyPayUntil(Instant payUntil) {
+    public void applyPayUntilTime(Instant payUntil) {
         this.setPayUntil(payUntil);
 
         registerEvent(PayUntil.builder()
@@ -128,7 +158,7 @@ import java.util.*;
                             .build());
     }
 
-    public void cancel(OrderDetails cancelReason) {
+    public void applyCanceledStatus(OrderDetails cancelReason) {
         if (this.status != OrderStatus.CANCELLED) {
 
             this.status = OrderStatus.CANCELLED;
@@ -156,7 +186,7 @@ import java.util.*;
         }
     }
 
-    public void paid() {
+    public void applyPaidStatus() {
         if (this.status != OrderStatus.CANCELLED) {
             this.status = OrderStatus.PAID;
 

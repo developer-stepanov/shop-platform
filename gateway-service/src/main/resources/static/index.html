@@ -98,8 +98,13 @@
 
                 /* 4️⃣  Price / status / aggregate */
                 if(body?.orderId){
-                    if(body.unitPrice !== undefined && body.sku){ applyPriceUpdate(body); }
+                    // 4a️⃣  Total amount update coming from backend (OrderTotalAmountUpdated)
+                    if(body.totalAmount !== undefined){ applyTotalAmountUpdate(body); }
+                    // 4b️⃣  Legacy incremental price update (unitPrice × qty) – kept for backward‑compatibility
+                    else if(body.unitPrice !== undefined && body.sku){ /* no‑op – deprecated */ }
+                    // 4c️⃣  Pure status change
                     else if(body.orderStatus && Object.keys(body).length === 2){ updateOrderStatus(body); }
+                    // 4d️⃣  Initial aggregate snapshot
                     else { addOrUpdateOrder(body); }
                 }
 
@@ -160,13 +165,18 @@
         ordersIndex.set(order.orderId, merged);
         renderOrderRow(merged);
     }
-    function applyPriceUpdate(update){
-        const order = ordersIndex.get(update.orderId); if(!order) return;
-        const itemsArr = order.orderItems || order.items || order.products || order.skus || [];
-        const itm = itemsArr.find(i => i.sku === update.sku); if(!itm) return;
-        order.price = Number(order.price || 0) + Number(update.unitPrice)*(itm.qty ?? 1);
+
+    /**
+     * Apply a total‑amount update coming from backend event OrderTotalAmountUpdated.
+     * The event body is expected to contain: { orderId: UUID, totalAmount: number }
+     */
+    function applyTotalAmountUpdate({orderId, totalAmount}){
+        const order = ordersIndex.get(orderId) || {orderId};
+        order.price = Number(totalAmount); // If totalAmount is in cents, divide by 100 here.
+        ordersIndex.set(orderId, order);
         renderOrderRow(order);
     }
+
     function updateOrderStatus({orderId, orderStatus}){
         const order = ordersIndex.get(orderId) || {orderId};
         order.orderStatus = orderStatus;

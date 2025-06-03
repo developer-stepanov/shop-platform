@@ -38,21 +38,25 @@ public class StockEventsConsumer {
         publisher.publishStockItems(items);
     }
 
-    @KafkaListener(topics = ORDER_FOR_STOCK_TOPIC, groupId = "price-update")
-    @Transactional(readOnly = true)
-    public void onUpdatePriceEvent(OrderForStock evt) {
-        List<StockItemEntity> items = repository.findBySkuIn(evt.orderItems().stream()
-                                    .map(OrderItem::sku)
-                                    .toList());
-
-        items.forEach(it -> {
-            publisher.publishUpdatedPrice(OrderPriceUpdate.builder()
-                                            .orderId(evt.orderId())
-                                            .sku(it.getSku())
-                                            .unitPrice(it.getUnitPrice())
-                                            .build());
-        });
-    }
+//    @KafkaListener(topics = ORDER_FOR_STOCK_TOPIC, groupId = "price-update")
+//    @Transactional(readOnly = true)
+//    public void onUpdatePriceEvent(OrderForStock evt) {
+//        List<StockItemEntity> items = repository.findBySkuIn(evt.orderItems().stream()
+//                                    .map(OrderItem::sku)
+//                                    .toList());
+//
+//        List<OrderPriceUpdate.PriceBySku> priceBySkus = items.stream().map(it ->
+//                                                                OrderPriceUpdate.PriceBySku.builder()
+//                                                                .sku(it.getSku())
+//                                                                .unitPrice(it.getUnitPrice())
+//                                                                .build())
+//                                                            .toList();
+//
+//        publisher.publishUpdatedPrice(OrderPriceUpdate.builder()
+//                                        .orderId(evt.orderId())
+//                                        .priceBySkus(priceBySkus)
+//                                        .build());
+//    }
 
     @KafkaListener(topics = ORDER_FOR_STOCK_TOPIC, groupId = "reserve-confirmation")
     public void onReserveItemsEvent(OrderForStock evt) {

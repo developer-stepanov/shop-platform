@@ -2,7 +2,7 @@ package com.stepanov.messaging;
 
 import com.stepanov.kafka.events.ItemsForSell;
 import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.ConfirmationReservation;
 import com.stepanov.kafka.events.OutOfStock;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -27,7 +27,7 @@ public class StockEventsPublisher {
         kafkaTemplate.send(ORDER_PRICE_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishReservedOrder(OrderReserved evt) {
+    public void publishReservedOrder(ConfirmationReservation evt) {
         kafkaTemplate.send(ORDER_RESERVED_TOPIC, evt.orderId().toString(), evt);
     }
 

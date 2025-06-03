@@ -3,16 +3,14 @@ package com.stepanov.service;
 import com.stepanov.entity.ReservationItemEntity;
 import com.stepanov.entity.StockItemEntity;
 
+import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.enums.ReservationStatus;
 
 import com.stepanov.exceptions.OutOfStockException;
 
-import com.stepanov.kafka.events.OrderForStock;
-import com.stepanov.kafka.events.OrderReserved;
-import com.stepanov.kafka.events.OutOfStock;
+import com.stepanov.kafka.events.*;
 
-import com.stepanov.kafka.events.StockRelease;
 import com.stepanov.messaging.StockEventsPublisher;
 
 import com.stepanov.repository.ReservationRepository;
@@ -24,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -37,8 +37,10 @@ public class StockService {
 
     @Transactional
     public void reserveBy(OrderForStock evt) {
+        List<ConfirmationReservation.UnitPrice> unitPrices = new ArrayList<>();
+        PaymentDetails paymentDetails;
 
-       evt.orderItems().forEach(it -> {
+        evt.orderItems().forEach(it -> {
            // Pessimistic lock – prevents oversell
            StockItemEntity stockItem = stockRepository.lockStockItemBySku(it.sku());
 
@@ -60,12 +62,25 @@ public class StockService {
                                                                    .reservationStatus(ReservationStatus.RESERVED)
                                                                    .build();
 
+           unitPrices.add(ConfirmationReservation.UnitPrice.builder()
+                                        .sku(stockItem.getSku())
+                                        .unitPrice(stockItem.getUnitPrice())
+                                        .build());
            reservationRepository.save(reservation);
-       });
+        });
 
-       publisher.publishReservedOrder(OrderReserved.builder()
+        paymentDetails = PaymentDetails.builder()
+                                    .totalPayment(unitPrices.stream()
+                                                    .map(ConfirmationReservation.UnitPrice::unitPrice)
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .currency(Currency.EUR)
+                                    .build();
+
+        publisher.publishReservedOrder(ConfirmationReservation.builder()
                                                     .orderId(evt.orderId())
                                                     .orderStatus(OrderStatus.RESERVED)
+                                                    .paymentDetails(paymentDetails)
+                                                    .unitPrices(unitPrices)
                                                     .build());
     }
 

@@ -37,15 +37,15 @@ public class OrderEventsConsumer {
         orderEventsPublisher.publishOrderForStock(orderForStock);
     }
 
-    @KafkaListener(topics = ORDER_PRICE_UPDATED_TOPIC)
-    @Transactional
-    public void onOrderPriceUpdated(OrderPriceUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-        orderService.updatePriceBySku(evt);
-    }
+//    @KafkaListener(topics = ORDER_PRICE_UPDATED_TOPIC)
+//    @Transactional
+//    public void onOrderPriceUpdated(OrderPriceUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+//        orderService.updatePriceBySku(evt);
+//    }
 
     @KafkaListener(topics = ORDER_RESERVED_TOPIC)
     @Transactional
-    public void onOrderReserved(OrderReserved evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void onOrderReserved(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         orderService.orderReserved(evt);
     }
 

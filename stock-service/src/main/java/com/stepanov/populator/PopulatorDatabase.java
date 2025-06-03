@@ -1,6 +1,7 @@
 package com.stepanov.populator;
 
 import com.stepanov.entity.StockItemEntity;
+import com.stepanov.enums.Currency;
 import com.stepanov.repository.StockRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("MacBook Pro")
                         .description("Nice laptop!")
                         .unitPrice(new BigDecimal("4500"))
+                        .currency(Currency.EUR)
                         .availableQty(10)
                         .build());
 
@@ -45,6 +47,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("Iphone 16")
                         .description("Good choice")
                         .unitPrice(new BigDecimal("1100"))
+                        .currency(Currency.EUR)
                         .availableQty(10)
                         .build());
 
@@ -54,6 +57,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .name("MacBook Air")
                         .description("Affordable laptop")
                         .unitPrice(new BigDecimal("1500"))
+                        .currency(Currency.EUR)
                         .availableQty(10)
                         .build());
 

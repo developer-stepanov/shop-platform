@@ -2,7 +2,7 @@ package com.stepanov.service;
 
 import com.stepanov.entity.PaymentEntity;
 import com.stepanov.enums.PaymentStatus;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.ConfirmationReservation;
 import com.stepanov.mapper.PaymentMapper;
 import com.stepanov.repository.PaymentRepository;
 import com.stripe.exception.StripeException;
@@ -25,7 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public PaymentEntity insertNewPaymentItem(OrderReserved evt) {
+    public PaymentEntity insertNewPaymentItem(ConfirmationReservation evt) {
         PaymentEntity paymentEntity = PaymentMapper.mapFrom(evt);
         return paymentRepository.save(paymentEntity);
     }
@@ -43,7 +43,8 @@ public class PaymentService {
                                     .setQuantity(1L)
                                     .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                                             .setCurrency(paymentItem.getCurrency().toString())
-                                            .setUnitAmount(paymentItem.getTotalPayment().longValue())
+                                            // value in cents
+                                            .setUnitAmount(100 * paymentItem.getTotalPayment().longValue())
                                             .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                     .setName("Order: " + paymentItem.getOrderId().toString())
                                                     .build())

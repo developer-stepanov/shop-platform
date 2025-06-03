@@ -47,7 +47,6 @@ public class OrderMapper {
                                                                 .build())
                                         .toList())
                 .orderStatus(orderEntity.getStatus())
-                .price(orderEntity.getTotalAmount())
                 .build();
     }
 

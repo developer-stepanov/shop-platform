@@ -1,14 +1,9 @@
 package com.stepanov.entity;
 
+import com.stepanov.enums.Currency;
 import com.stepanov.kafka.events.StockItemUpdateQty;
+import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +33,10 @@ public class StockItemEntity extends AbstractAggregateRoot<StockItemEntity>  {
 
     @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 3)
+    private Currency currency;
 
     @Column(nullable = false, length = 100)
     private String name;

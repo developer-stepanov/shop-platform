@@ -20,6 +20,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="currency" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="name" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>

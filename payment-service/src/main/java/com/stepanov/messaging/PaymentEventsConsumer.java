@@ -2,7 +2,7 @@ package com.stepanov.messaging;
 
 import com.stepanov.entity.PaymentEntity;
 import com.stepanov.exceptions.EmptyStripeSession;
-import com.stepanov.kafka.events.OrderReserved;
+import com.stepanov.kafka.events.ConfirmationReservation;
 import com.stepanov.service.PaymentService;
 import com.stripe.model.checkout.Session;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class PaymentEventsConsumer {
 
     @KafkaListener(topics = PAYMENT_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes
-    public void onCreateOrder(OrderReserved evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void onCreateOrder(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         PaymentEntity paymentItem = paymentService.insertNewPaymentItem(evt);
         Session stripeSession = paymentService.createCheckoutLink(paymentItem)
                                     .orElseThrow(() -> new EmptyStripeSession("OrderId: " + evt.orderId()));

@@ -1,8 +1,8 @@
 package com.stepanov.messaging;
 
+import com.stepanov.enums.OrderStatus;
 import com.stepanov.kafka.events.*;
 
-import com.stepanov.scheduler.PaymentTimeoutScheduler;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,13 +25,16 @@ public class OrderDomainEventListener {
         Listens to changes in DomainEvents in OrderEntity and publish events to Kafka
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publishOrderPriceUpdate(OrderPriceUpdate evt) {
+    public void publishOrderPriceUpdate(OrderTotalAmountUpdated evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publishOrderReserved(OrderReserved evt) {
-        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt); // fire -> gateway -> UI
+    public void publishOrderReserved(ConfirmationReservation evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), OrderReserved.builder()
+                                                                            .orderId(evt.orderId())
+                                                                            .orderStatus(OrderStatus.RESERVED)
+                                                                            .build()); // fire -> gateway -> UI
         kafkaTemplate.send(PAYMENT_CREATED_TOPIC, evt.orderId().toString(), evt); // fire -> payment
     }
 

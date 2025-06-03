@@ -12,6 +12,5 @@ public record OrderAccepted(
         UUID clientRequestId,
         UUID orderId,
         List<OrderItem> orderItems,
-        BigDecimal price,
         OrderStatus orderStatus
 ) {}

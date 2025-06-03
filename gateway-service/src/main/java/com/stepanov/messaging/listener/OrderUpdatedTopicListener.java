@@ -21,7 +21,7 @@ public class OrderUpdatedTopicListener {
     private final SimpMessagingTemplate broker;
 
     @KafkaHandler
-    void on(OrderPriceUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(OrderTotalAmountUpdated evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
 
         broker.convertAndSend("/topic/events",
                 evt,

@@ -3,8 +3,11 @@ package com.stepanov.entity;
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.*;
 
+import com.stepanov.kafka.events.topics.orders.*;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.OrderPriceUpdate;
+import com.stepanov.kafka.events.topics.stock.PaymentDetails;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;

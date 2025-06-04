@@ -1,9 +1,9 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.OrderAccepted;
-import com.stepanov.kafka.events.OrderForStock;
-import com.stepanov.kafka.events.OrderTableItem;
-import com.stepanov.kafka.events.StockRelease;
+import com.stepanov.kafka.events.topics.orders.OrderAccepted;
+import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.orders.OrderTableItem;
+import com.stepanov.kafka.events.topics.orders.StockRelease;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

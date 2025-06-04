@@ -1,7 +1,7 @@
 package com.stepanov.mapper;
 
 import com.stepanov.entity.StockItemEntity;
-import com.stepanov.kafka.events.ItemsForSell;
+import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 
 import java.util.List;
 

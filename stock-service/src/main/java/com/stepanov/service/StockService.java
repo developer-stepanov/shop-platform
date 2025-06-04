@@ -9,8 +9,12 @@ import com.stepanov.enums.ReservationStatus;
 
 import com.stepanov.exceptions.OutOfStockException;
 
-import com.stepanov.kafka.events.*;
-
+import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.orders.StockRelease;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.ItemsForSell;
+import com.stepanov.kafka.events.topics.stock.OutOfStock;
+import com.stepanov.kafka.events.topics.stock.PaymentDetails;
 import com.stepanov.mapper.StockMapper;
 import com.stepanov.messaging.StockEventsPublisher;
 

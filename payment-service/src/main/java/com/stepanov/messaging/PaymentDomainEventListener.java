@@ -1,7 +1,7 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.PaymentLink;
-import com.stepanov.kafka.events.PaymentSuccessful;
+import com.stepanov.kafka.events.topics.payments.PaymentLink;
+import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

@@ -2,7 +2,7 @@ package com.stepanov.messaging;
 
 import com.stepanov.entity.PaymentEntity;
 import com.stepanov.exceptions.EmptyStripeSession;
-import com.stepanov.kafka.events.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.service.PaymentService;
 import com.stripe.model.checkout.Session;
 import lombok.AllArgsConstructor;

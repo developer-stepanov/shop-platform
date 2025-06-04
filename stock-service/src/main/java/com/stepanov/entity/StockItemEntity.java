@@ -1,7 +1,7 @@
 package com.stepanov.entity;
 
 import com.stepanov.enums.Currency;
-import com.stepanov.kafka.events.StockItemUpdateQty;
+import com.stepanov.kafka.events.topics.stock.StockItemUpdateQty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 

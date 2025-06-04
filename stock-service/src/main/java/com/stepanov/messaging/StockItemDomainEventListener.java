@@ -1,7 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.entity.StockItemEntity;
-import com.stepanov.kafka.events.StockItemUpdateQty;
+import com.stepanov.kafka.events.topics.stock.StockItemUpdateQty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

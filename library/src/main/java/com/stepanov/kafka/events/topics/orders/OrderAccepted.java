@@ -1,9 +1,8 @@
-package com.stepanov.kafka.events;
+package com.stepanov.kafka.events.topics.orders;
 
 import com.stepanov.enums.OrderStatus;
 import lombok.Builder;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 

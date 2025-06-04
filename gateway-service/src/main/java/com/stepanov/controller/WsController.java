@@ -1,7 +1,7 @@
 package com.stepanov.controller;
 
-import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.OrderItem;
+import com.stepanov.kafka.events.topics.orders.CreateOrder;
+import com.stepanov.kafka.events.topics.orders.OrderItem;
 import com.stepanov.messaging.publisher.GatewayEventsPublisher;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;

@@ -1,8 +1,9 @@
 package com.stepanov.messaging;
 
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.*;
 
+import com.stepanov.kafka.events.topics.orders.*;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.kafka.core.KafkaTemplate;

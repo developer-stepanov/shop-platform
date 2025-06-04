@@ -1,8 +1,9 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.*;
-
 import com.stepanov.exceptions.OutOfStockException;
+import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.orders.StockRelease;
+import com.stepanov.kafka.events.topics.stock.ItemsForSellCmd;
 import com.stepanov.service.StockService;
 
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package com.stepanov.mapper;
 
 import com.stepanov.entity.PaymentEntity;
-import com.stepanov.kafka.events.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 
 public class PaymentMapper {
 

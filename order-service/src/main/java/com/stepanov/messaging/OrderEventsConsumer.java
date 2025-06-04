@@ -1,7 +1,13 @@
 package com.stepanov.messaging;
 
 import com.stepanov.entity.OrderEntity;
-import com.stepanov.kafka.events.*;
+import com.stepanov.kafka.events.topics.orders.CreateOrder;
+import com.stepanov.kafka.events.topics.orders.OrderAccepted;
+import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.payments.PaymentLink;
+import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.mapper.OrderMapper;
 
 import com.stepanov.service.OrderService;
@@ -13,8 +19,6 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.stepanov.kafka.topics.KafkaTopics.*;
 

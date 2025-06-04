@@ -1,6 +1,6 @@
 package com.stepanov.messaging.listener;
 
-import com.stepanov.kafka.events.ItemsForSell;
+import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,6 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.OrderTableItemCmd;
+import com.stepanov.kafka.events.topics.orders.OrderTableItemCmd;
 import com.stepanov.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;

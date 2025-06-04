@@ -5,7 +5,7 @@ import com.stepanov.entity.OrderEntity;
 import com.stepanov.entity.OrderItemEntity;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.*;
+import com.stepanov.kafka.events.topics.orders.*;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.stepanov.messaging.publisher;
 
-import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.OrderTableItemCmd;
-import com.stepanov.kafka.events.ItemsForSellCmd;
+import com.stepanov.kafka.events.topics.orders.CreateOrder;
+import com.stepanov.kafka.events.topics.orders.OrderTableItemCmd;
+import com.stepanov.kafka.events.topics.stock.ItemsForSellCmd;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

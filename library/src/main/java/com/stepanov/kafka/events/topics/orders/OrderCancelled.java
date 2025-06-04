@@ -1,4 +1,4 @@
-package com.stepanov.kafka.events;
+package com.stepanov.kafka.events.topics.orders;
 
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.OrderStatus;

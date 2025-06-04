@@ -1,6 +1,6 @@
 package com.stepanov.messaging.listener;
 
-import com.stepanov.kafka.events.OrderAccepted;
+import com.stepanov.kafka.events.topics.orders.OrderAccepted;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;

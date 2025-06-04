@@ -1,9 +1,9 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.ItemsForSell;
-import com.stepanov.kafka.events.OrderPriceUpdate;
-import com.stepanov.kafka.events.ConfirmationReservation;
-import com.stepanov.kafka.events.OutOfStock;
+import com.stepanov.kafka.events.topics.stock.ItemsForSell;
+import com.stepanov.kafka.events.topics.stock.OrderPriceUpdate;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

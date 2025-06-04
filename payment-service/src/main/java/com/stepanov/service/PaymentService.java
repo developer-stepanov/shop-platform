@@ -2,7 +2,7 @@ package com.stepanov.service;
 
 import com.stepanov.entity.PaymentEntity;
 import com.stepanov.enums.PaymentStatus;
-import com.stepanov.kafka.events.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.mapper.PaymentMapper;
 import com.stepanov.repository.PaymentRepository;
 import com.stripe.exception.StripeException;

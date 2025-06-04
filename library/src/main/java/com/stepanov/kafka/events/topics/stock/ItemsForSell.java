@@ -1,4 +1,4 @@
-package com.stepanov.kafka.events;
+package com.stepanov.kafka.events.topics.stock;
 
 import lombok.Builder;
 

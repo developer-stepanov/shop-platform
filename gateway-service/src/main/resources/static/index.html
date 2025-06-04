@@ -71,9 +71,10 @@
 <script>
     // ----------- CONFIG -----------
     const GET_PRODUCTS_DEST = '/app/get-product-items';
+    const GET_ORDERS_DEST   = '/app/get-order-items';   // 🔸 fetch existing orders on connect
 
     // ----------- STATE -----------
-    // orderId → { clientRequestId, orderId, orderItems, price, orderStatus, details, paymentLink }
+    // orderId → { clientRequestId, orderId, orderItems, price, totalAmount, orderStatus, details, paymentLink }
     const ordersIndex = new Map();
 
     // ----------- WEBSOCKET --------
@@ -81,6 +82,9 @@
     const stomp = Stomp.over(sock);
 
     stomp.connect({}, () => {
+        /* -------------------------------------------------------------
+         *  Subscribe to the single consolidated event stream
+         * ----------------------------------------------------------- */
         stomp.subscribe('/topic/events', msg => {
             const type = msg.headers['event-type'] || 'UNKNOWN';
             try {
@@ -89,6 +93,10 @@
                 /* 1️⃣  Product list */
                 const products = Array.isArray(body) ? body : Array.isArray(body?.items) ? body.items : null;
                 if(products?.length && products[0].sku){ renderProducts(products); }
+
+                /* 1️⃣b Order list – full snapshot returned by /get-order-items */
+                const initialOrders = Array.isArray(body) && body[0]?.orderId ? body : null;
+                if(initialOrders){ initialOrders.forEach(addOrUpdateOrder); }
 
                 /* 2️⃣  Stock update */
                 if(body?.sku && body.qty !== undefined && Object.keys(body).length === 2){ updateStockQty(body); }
@@ -104,7 +112,7 @@
                     else if(body.unitPrice !== undefined && body.sku){ /* no‑op – deprecated */ }
                     // 4c️⃣  Pure status change
                     else if(body.orderStatus && Object.keys(body).length === 2){ updateOrderStatus(body); }
-                    // 4d️⃣  Initial aggregate snapshot
+                    // 4d️⃣  Initial aggregate snapshot or other mixed payload
                     else { addOrUpdateOrder(body); }
                 }
 
@@ -115,8 +123,11 @@
             } catch {/* non‑JSON */}
         });
 
-        // Initial product list
-        stomp.send(GET_PRODUCTS_DEST, {}, '');
+        /* ----------------------------------------
+         *  Fetch initial datasets after connection
+         * -------------------------------------- */
+        stomp.send(GET_PRODUCTS_DEST, {}, '');  // initial product list
+        stomp.send(GET_ORDERS_DEST,   {}, '');  // initial order list
     });
 
     // ----------- UI -----------
@@ -160,7 +171,12 @@
 
     /* ---------- Order helpers ---------- */
     function addOrUpdateOrder(order){
+        // Merge with any existing record first
         const merged = {...(ordersIndex.get(order.orderId) || {}), ...order};
+
+        // 🔹 Ensure totalAmount is visible – map to price if price is absent
+        if(merged.price == null && merged.totalAmount != null){ merged.price = Number(merged.totalAmount); }
+
         if(merged.orderStatus?.toUpperCase() === 'CANCELLED'){ delete merged.paymentLink; }
         ordersIndex.set(order.orderId, merged);
         renderOrderRow(merged);
@@ -173,6 +189,7 @@
     function applyTotalAmountUpdate({orderId, totalAmount}){
         const order = ordersIndex.get(orderId) || {orderId};
         order.price = Number(totalAmount); // If totalAmount is in cents, divide by 100 here.
+        order.totalAmount = Number(totalAmount); // Keep original for completeness
         ordersIndex.set(orderId, order);
         renderOrderRow(order);
     }
@@ -211,7 +228,11 @@
         const cells = row.children;
         cells[0].textContent = order.orderId;
         cells[1].textContent = itemsStr;
-        cells[2].textContent = order.price != null ? `€ ${Number(order.price).toFixed(2)}` : '';
+
+        // 🔹 Price / totalAmount fallback
+        const amount = order.price != null ? order.price : order.totalAmount;
+        cells[2].textContent = amount != null ? `€ ${Number(amount).toFixed(2)}` : '';
+
         cells[3].innerHTML  = getStatusChip(order.orderStatus);
         cells[4].innerHTML  = `${getDetailsChip(order.details)} ${getPayButton(order.paymentLink)}`.trim();
     }

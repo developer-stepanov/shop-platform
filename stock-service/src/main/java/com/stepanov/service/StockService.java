@@ -11,6 +11,7 @@ import com.stepanov.exceptions.OutOfStockException;
 
 import com.stepanov.kafka.events.*;
 
+import com.stepanov.mapper.StockMapper;
 import com.stepanov.messaging.StockEventsPublisher;
 
 import com.stepanov.repository.ReservationRepository;
@@ -34,6 +35,13 @@ public class StockService {
     private final StockRepository stockRepository;
 
     private final ReservationRepository reservationRepository;
+
+    public void itemsForSell() {
+        List<StockItemEntity> stockEntities = stockRepository.findAll();
+        ItemsForSell items = StockMapper.fromStockItems(stockEntities);
+
+        publisher.publishStockItems(items);
+    }
 
     @Transactional
     public void reserveBy(OrderForStock evt) {

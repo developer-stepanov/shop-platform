@@ -14,6 +14,10 @@ public class KafkaTopics {
 
     public static final String ITEMS_FOR_SELL_TOPIC = "items-for-sell.v1";
 
+    public static final String ORDER_TABLE_ITEMS_CMD_TOPIC = "order-table-items-cmd.v1";
+
+    public static final String ORDER_TABLE_ITEMS_TOPIC = "order-table-items.v1";
+
     public static final String ORDER_UPDATED_TOPIC = "order-updated.v1";
 
     public static final String ORDER_RESERVED_TOPIC = "order-reserved.v1";

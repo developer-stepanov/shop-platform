@@ -5,15 +5,31 @@ import com.stepanov.entity.OrderEntity;
 import com.stepanov.entity.OrderItemEntity;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.OrderAccepted;
-import com.stepanov.kafka.events.OrderForStock;
-import com.stepanov.kafka.events.OrderItem;
+import com.stepanov.kafka.events.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public class OrderMapper {
+
+    public static List<OrderTableItem> fromEntity(List<OrderEntity> orders) {
+        return orders.stream()
+                .map(o -> OrderTableItem.builder()
+                            .orderId(o.getId())
+                            .orderItems(o.getItems().stream()
+                                        .map(it -> OrderItem.builder()
+                                                                    .sku(it.getSku())
+                                                                    .qty(it.getQty())
+                                                                    .build())
+                                                                .toList())
+                            .totalAmount(o.getTotalAmount())
+                            .orderStatus(o.getStatus())
+                            .details(o.getCancelReason())
+                            .paymentLink(o.getStatus() != OrderStatus.PAID ? o.getPaymentLink() : null)
+                            .build())
+                .toList();
+    }
 
     public static OrderEntity toEntity(CreateOrder event) {
 

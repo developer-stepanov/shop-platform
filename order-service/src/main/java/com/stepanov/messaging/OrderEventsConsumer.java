@@ -14,6 +14,8 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
@@ -23,6 +25,11 @@ public class OrderEventsConsumer {
     private final OrderEventsPublisher orderEventsPublisher;
 
     private final OrderService orderService;
+
+//    @KafkaListener(topics = ORDER_TABLE_ITEMS_TOPIC)
+//    public void onFetchOrderTableItems(OrderTableItemCmd evt) {
+//        orderEventsPublisher.publishOrderTableItems(orderService.fetchOrderItems());
+//    }
 
     @KafkaListener(topics = ORDER_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes
@@ -36,12 +43,6 @@ public class OrderEventsConsumer {
         orderEventsPublisher.publishOrderAccepted(orderAccepted);
         orderEventsPublisher.publishOrderForStock(orderForStock);
     }
-
-//    @KafkaListener(topics = ORDER_PRICE_UPDATED_TOPIC)
-//    @Transactional
-//    public void onOrderPriceUpdated(OrderPriceUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-//        orderService.updatePriceBySku(evt);
-//    }
 
     @KafkaListener(topics = ORDER_RESERVED_TOPIC)
     @Transactional

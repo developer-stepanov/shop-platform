@@ -6,11 +6,13 @@ import com.stepanov.kafka.events.*;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.repository.OrderRepository;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +22,11 @@ public class OrderService {
     private static final long GAP_TO_PAY_MINUTES = 5;
 
     private final OrderRepository orderRepository;
+
+    @Transactional(readOnly = true)
+    public List<OrderTableItem> fetchOrderItems() {
+        return OrderMapper.fromEntity(orderRepository.findAll());
+    }
 
     @Transactional
     public OrderEntity createOrder(CreateOrder evt) {

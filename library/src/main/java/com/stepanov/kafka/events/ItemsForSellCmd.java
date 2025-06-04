@@ -1,4 +1,4 @@
 package com.stepanov.kafka.events;
 
-public record GiveItemsForSell() {
+public record ItemsForSellCmd() {
 }

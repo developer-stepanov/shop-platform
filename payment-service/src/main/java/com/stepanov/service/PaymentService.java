@@ -36,7 +36,7 @@ public class PaymentService {
             session = Session.create(
                     SessionCreateParams.builder()
                             .setMode(SessionCreateParams.Mode.PAYMENT)
-                            .setSuccessUrl("http://localhost:9999") // change to gateway controller to show that
+                            .setSuccessUrl("http://localhost:8080/payment/confirmation") // change to gateway controller to show that
                                                                     // payment is successful
                             .putMetadata(METADATA_ORDER_ID, paymentItem.getOrderId().toString())
                             .addLineItem(SessionCreateParams.LineItem.builder()

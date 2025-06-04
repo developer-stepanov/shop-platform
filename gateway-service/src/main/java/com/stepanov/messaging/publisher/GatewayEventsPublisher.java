@@ -1,13 +1,13 @@
 package com.stepanov.messaging.publisher;
 
 import com.stepanov.kafka.events.CreateOrder;
-import com.stepanov.kafka.events.GiveItemsForSell;
+import com.stepanov.kafka.events.OrderTableItemCmd;
+import com.stepanov.kafka.events.ItemsForSellCmd;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_CREATED_TOPIC;
-import static com.stepanov.kafka.topics.KafkaTopics.GIVE_ITEMS_FOR_SELL_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +20,11 @@ public class GatewayEventsPublisher {
     }
 
     public void publishGiveItemsForSell() {
-        kafkaTemplate.send(GIVE_ITEMS_FOR_SELL_TOPIC, new GiveItemsForSell());
+        kafkaTemplate.send(GIVE_ITEMS_FOR_SELL_TOPIC, new ItemsForSellCmd());
+    }
+
+    public void publishOrderTableItems() {
+        kafkaTemplate.send(ORDER_TABLE_ITEMS_CMD_TOPIC, new OrderTableItemCmd());
     }
 
 }

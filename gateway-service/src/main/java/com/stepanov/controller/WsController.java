@@ -25,8 +25,13 @@ public class WsController {
     }
 
     @MessageMapping("/get-product-items")
-    public void handleGiveItemsForSellEvent() {
+    public void handleItemsForSellEvent() {
         publisher.publishGiveItemsForSell();
+    }
+
+    @MessageMapping("/get-order-items")
+    public void handleOrderItemsEvent() {
+        publisher.publishOrderTableItems();
     }
 
 }

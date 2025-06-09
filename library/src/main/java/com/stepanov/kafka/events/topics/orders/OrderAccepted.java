@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @Builder
 public record OrderAccepted(
-        UUID clientRequestId,
         UUID orderId,
         List<OrderItem> orderItems,
         OrderStatus orderStatus

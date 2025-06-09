@@ -16,7 +16,7 @@ public class GatewayEventsPublisher {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void publishCreateOrder(CreateOrder evt) {
-        kafkaTemplate.send(ORDER_CREATED_TOPIC, evt.clientRequestId().toString(), evt);
+        kafkaTemplate.send(ORDER_CREATED_TOPIC, evt);
     }
 
     public void publishGiveItemsForSell() {

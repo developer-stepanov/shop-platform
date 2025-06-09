@@ -9,7 +9,6 @@ import com.stepanov.kafka.events.topics.orders.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 public class OrderMapper {
 
@@ -52,9 +51,8 @@ public class OrderMapper {
         return orderEntity;
     }
 
-    public static OrderAccepted toOrderAccepted(UUID clientRequestId, OrderEntity orderEntity) {
+    public static OrderAccepted toOrderAccepted(OrderEntity orderEntity) {
         return OrderAccepted.builder()
-                .clientRequestId(clientRequestId)
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()
                                         .map(it -> OrderItem.builder()

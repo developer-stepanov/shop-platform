@@ -7,9 +7,4 @@ import java.util.UUID;
 
 // add time field to kafka events
 @Builder
-public record CreateOrder(
-        UUID clientRequestId,
-        List<OrderItem> orderItems
-) {
-
-}
+public record CreateOrder(List<OrderItem> orderItems) {}

@@ -8,7 +8,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @AllArgsConstructor
@@ -18,10 +17,7 @@ public class WsController {
 
     @MessageMapping("/make-order")
     public void handleCreateOrderEvent(List<OrderItem> orderItems) {
-        publisher.publishCreateOrder(CreateOrder.builder()
-                                        .clientRequestId(UUID.randomUUID())
-                                        .orderItems(orderItems)
-                                     .build());
+        publisher.publishCreateOrder(CreateOrder.builder().orderItems(orderItems).build());
     }
 
     @MessageMapping("/get-product-items")

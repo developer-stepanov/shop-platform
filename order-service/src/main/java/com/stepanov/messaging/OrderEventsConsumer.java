@@ -30,18 +30,13 @@ public class OrderEventsConsumer {
 
     private final OrderService orderService;
 
-//    @KafkaListener(topics = ORDER_TABLE_ITEMS_TOPIC)
-//    public void onFetchOrderTableItems(OrderTableItemCmd evt) {
-//        orderEventsPublisher.publishOrderTableItems(orderService.fetchOrderItems());
-//    }
-
     @KafkaListener(topics = ORDER_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes
-    public void onCreateOrder(CreateOrder evt, @Header(KafkaHeaders.RECEIVED_KEY) String clientRequestId) {
+    public void onCreateOrder(CreateOrder evt) {
 
         OrderEntity savedOrder = orderService.createOrder(evt);
 
-        OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(evt.clientRequestId(), savedOrder);
+        OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
         OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
 
         orderEventsPublisher.publishOrderAccepted(orderAccepted);

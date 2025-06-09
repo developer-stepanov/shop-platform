@@ -15,16 +15,16 @@ import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_SUCCESS_TOPIC;
 @RequiredArgsConstructor
 public class PaymentDomainEventListener {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final PaymentsPublisher publisher;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publishCheckoutLink(PaymentLink evt) {
-        kafkaTemplate.send(PAYMENT_LINK_TOPIC, evt.orderId().toString(), evt);
+    public void on(PaymentLink evt) {
+        publisher.publishCheckoutLink(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publishPaymentSucceeded(PaymentSuccessful evt) {
-        kafkaTemplate.send(PAYMENT_SUCCESS_TOPIC, evt.orderId().toString(), evt);
+    public void on(PaymentSuccessful evt) {
+        publisher.publishPaymentSucceeded(evt);
     }
 
 }

@@ -20,7 +20,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_CREATED_TOPIC;
 @Slf4j
 public class PaymentEventsConsumer {
 
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
 
     @KafkaListener(topics = PAYMENT_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes

@@ -23,7 +23,7 @@ public class OrderEventsPublisher {
     }
 
     public void publishOrderAccepted(OrderAccepted evt) {
-        kafkaTemplate.send(ORDER_ACCEPTED_TOPIC, evt.clientRequestId().toString(), evt);
+        kafkaTemplate.send(ORDER_ACCEPTED_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publishOrderForStock(OrderForStock evt) {

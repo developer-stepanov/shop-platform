@@ -39,8 +39,8 @@ public class OrderListener {
         OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
         OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
 
-        publisher.publishOrderAccepted(orderAccepted);
-        publisher.publishOrderForStock(orderForStock);
+        publisher.publish(orderAccepted);
+        publisher.publish(orderForStock);
     }
 
     @KafkaListener(topics = ORDER_RESERVED_TOPIC)

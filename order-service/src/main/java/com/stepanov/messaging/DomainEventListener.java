@@ -22,7 +22,7 @@ public class DomainEventListener {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(OrderTotalAmountUpdated evt) {
-        publisher.publishOrderPriceUpdate(evt);
+        publisher.publish(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -31,22 +31,22 @@ public class DomainEventListener {
                                             .orderId(evt.orderId())
                                             .orderStatus(OrderStatus.RESERVED)
                                             .build();
-        publisher.publishOrderReserved(orderReserved);
-        publisher.publishConfirmationToPayment(evt);
+        publisher.publish(orderReserved);
+        publisher.publish(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(OrderCancelled evt) {
-        publisher.publishOrderCancelled(evt);
+        publisher.publish(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(OrderPaymentLinkUpdate evt) {
-        publisher.publishOrderPaymentLinkUpdate(evt);
+        publisher.publish(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(OrderPaid evt) {
-        publisher.publishOrderPaid(evt);
+        publisher.publish(evt);
     }
 }

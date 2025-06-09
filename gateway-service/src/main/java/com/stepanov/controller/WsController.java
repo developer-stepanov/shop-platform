@@ -16,18 +16,18 @@ public class WsController {
     private final GatewayPublisher publisher;
 
     @MessageMapping("/make-order")
-    public void handleCreateOrderEvent(List<OrderItem> orderItems) {
-        publisher.publishCreateOrder(CreateOrder.builder().orderItems(orderItems).build());
+    public void createOrder(List<OrderItem> orderItems) {
+        publisher.createOrderCmd(CreateOrder.builder().orderItems(orderItems).build());
     }
 
     @MessageMapping("/get-product-items")
-    public void handleItemsForSellEvent() {
-        publisher.publishGiveItemsForSell();
+    public void fetchProducts() {
+        publisher.fetchProductsCmd();
     }
 
     @MessageMapping("/get-order-items")
-    public void handleOrderItemsEvent() {
-        publisher.publishOrderTableItems();
+    public void fetchOrders() {
+        publisher.fetchOrdersCmd();
     }
 
 }

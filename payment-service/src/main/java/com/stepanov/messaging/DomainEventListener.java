@@ -15,12 +15,12 @@ public class DomainEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(PaymentLink evt) {
-        publisher.publishCheckoutLink(evt);
+        publisher.publish(evt);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(PaymentSuccessful evt) {
-        publisher.publishPaymentSucceeded(evt);
+        publisher.publish(evt);
     }
 
 }

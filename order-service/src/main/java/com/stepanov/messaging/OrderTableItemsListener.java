@@ -20,7 +20,7 @@ public class OrderTableItemsListener {
 
     @KafkaHandler
     void on(OrderTableItemCmd evt) {
-        orderEventsPublisher.publishOrderTableItems(orderService.fetchOrderItems());
+        orderEventsPublisher.publish(orderService.fetchOrderItems());
     }
 
 }

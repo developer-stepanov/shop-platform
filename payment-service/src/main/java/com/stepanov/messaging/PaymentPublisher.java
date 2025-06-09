@@ -17,11 +17,11 @@ public class PaymentPublisher {
 
     private final KafkaTemplate<String, Object> kafka;
 
-    public void publishCheckoutLink(PaymentLink evt) {
+    public void publish(PaymentLink evt) {
         kafka.send(PAYMENT_LINK_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishPaymentSucceeded(PaymentSuccessful evt) {
+    public void publish(PaymentSuccessful evt) {
         kafka.send(PAYMENT_SUCCESS_TOPIC, evt.orderId().toString(), evt);
     }
 }

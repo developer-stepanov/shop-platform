@@ -44,7 +44,7 @@ public class StockService {
         List<StockItem> stockEntities = stockRepository.findAll();
         ItemsForSell items = StockMapper.fromStockItems(stockEntities);
 
-        publisher.publishStockItems(items);
+        publisher.publish(items);
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class StockService {
            final int itemsToReserve = it.qty();
 
            if (stockItem.getAvailableQty() < itemsToReserve) {
-               publisher.publishOutOfStock(OutOfStock.builder().orderId(evt.orderId()).build());
+               publisher.publish(OutOfStock.builder().orderId(evt.orderId()).build());
                String exceptionMsg = String.format("%s has less then %s items", stockItem.getSku(), itemsToReserve);
                throw new OutOfStockException(exceptionMsg);
            }
@@ -88,7 +88,7 @@ public class StockService {
                                     .currency(Currency.EUR)
                                     .build();
 
-        publisher.publishReservedOrder(ConfirmationReservation.builder()
+        publisher.publish(ConfirmationReservation.builder()
                                                     .orderId(evt.orderId())
                                                     .orderStatus(OrderStatus.RESERVED)
                                                     .paymentDetails(paymentDetails)

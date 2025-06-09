@@ -16,43 +16,43 @@ public class OrderPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishOrderTableItems(List<OrderTableItem> evt) {
+    public void publish(List<OrderTableItem> evt) {
         kafkaTemplate.send(ORDER_TABLE_ITEMS_TOPIC, evt);
     }
 
-    public void publishOrderAccepted(OrderAccepted evt) {
+    public void publish(OrderAccepted evt) {
         kafkaTemplate.send(ORDER_ACCEPTED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderForStock(OrderForStock evt) {
+    public void publish(OrderForStock evt) {
         kafkaTemplate.send(ORDER_FOR_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishStockRelease(StockRelease evt) {
+    public void publish(StockRelease evt) {
         kafkaTemplate.send(STOCK_RELEASE_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderPriceUpdate(OrderTotalAmountUpdated evt) {
+    public void publish(OrderTotalAmountUpdated evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderReserved(OrderReserved evt) {
+    public void publish(OrderReserved evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderCancelled(OrderCancelled evt) {
+    public void publish(OrderCancelled evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderPaymentLinkUpdate(OrderPaymentLinkUpdate evt) {
+    public void publish(OrderPaymentLinkUpdate evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOrderPaid(OrderPaid evt) {
+    public void publish(OrderPaid evt) {
         kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishConfirmationToPayment(ConfirmationReservation evt) {
+    public void publish(ConfirmationReservation evt) {
         kafkaTemplate.send(PAYMENT_CREATED_TOPIC, evt.orderId().toString(), evt);
     }
 

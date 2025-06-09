@@ -16,19 +16,19 @@ public class StockPublisher {
 
     private final KafkaTemplate<String, Object> kafka;
 
-    public void publishStockItems(ItemsForSell evt) {
+    public void publish(ItemsForSell evt) {
         kafka.send(ITEMS_FOR_SELL_TOPIC, evt);
     }
 
-    public void publishReservedOrder(ConfirmationReservation evt) {
+    public void publish(ConfirmationReservation evt) {
         kafka.send(ORDER_RESERVED_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishOutOfStock(OutOfStock evt) {
+    public void publish(OutOfStock evt) {
         kafka.send(OUT_OF_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publishStockItemAvailableQtyChanged(StockItemUpdateQty evt) {
+    public void publish(StockItemUpdateQty evt) {
         kafka.send(STOCK_ITEM_UPDATE_TOPIC, evt.sku(), evt);
     }
 }

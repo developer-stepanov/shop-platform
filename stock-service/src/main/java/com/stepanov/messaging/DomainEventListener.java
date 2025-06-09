@@ -14,6 +14,6 @@ public class DomainEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(StockItemUpdateQty evt) {
-        publisher.publishStockItemAvailableQtyChanged(evt);
+        publisher.publish(evt);
     }
 }

@@ -10,15 +10,15 @@ spring:
 
   # --- Postgres wiring ---
   datasource:
-    url: jdbc:postgresql://localhost:5434/payment-db   # host is the Compose service name
+    url: jdbc:postgresql://localhost:5434/payment-db
     username: user
     password: user
     driver-class-name: org.postgresql.Driver
 
-  # --- JPA ---
+  # --- JPA wiring ---
   jpa:
     hibernate:
-      ddl-auto: validate                           # schema managed by Liquibase
+      ddl-auto: validate                        # schema managed by Liquibase
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

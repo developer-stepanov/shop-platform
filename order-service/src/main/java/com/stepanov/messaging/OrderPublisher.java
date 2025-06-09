@@ -14,7 +14,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
 @AllArgsConstructor
-public class OrderEventsPublisher {
+public class OrderPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 

@@ -11,7 +11,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Service
 @AllArgsConstructor
-public class GatewayEventsPublisher {
+public class GatewayPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 

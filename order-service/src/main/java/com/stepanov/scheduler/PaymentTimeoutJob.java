@@ -1,12 +1,12 @@
 package com.stepanov.scheduler;
 
-import com.stepanov.entity.OrderEntity;
+import com.stepanov.entity.Order;
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.exceptions.NotFoundEntityException;
 import com.stepanov.kafka.events.topics.orders.OrderItem;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
-import com.stepanov.messaging.OrderEventsPublisher;
+import com.stepanov.messaging.OrderPublisher;
 import com.stepanov.repository.OrderRepository;
 import lombok.AllArgsConstructor;
 import org.quartz.Job;
@@ -23,7 +23,7 @@ import static com.stepanov.scheduler.PaymentTimeoutScheduler.ORDER_ID_JOB_KEY;
 @AllArgsConstructor
 public class PaymentTimeoutJob implements Job {
 
-    private final OrderEventsPublisher orderEventsPublisher;
+    private final OrderPublisher orderEventsPublisher;
 
     private final OrderRepository orderRepository;
 
@@ -32,10 +32,10 @@ public class PaymentTimeoutJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         UUID orderId = UUID.fromString(jobExecutionContext.getMergedJobDataMap().getString(ORDER_ID_JOB_KEY));
 
-        OrderEntity orderEntity = orderRepository.findById(orderId)
+        Order orderEntity = orderRepository.findById(orderId)
                                                     .orElseThrow(() ->
                                                             throwNotFoundEntityException(
-                                                                    OrderEntity.class.getSimpleName(),
+                                                                    Order.class.getSimpleName(),
                                                                     orderId.toString()
                                                             ));
 

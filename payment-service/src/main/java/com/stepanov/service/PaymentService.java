@@ -1,6 +1,6 @@
 package com.stepanov.service;
 
-import com.stepanov.entity.PaymentEntity;
+import com.stepanov.entity.Payment;
 import com.stepanov.enums.PaymentStatus;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.mapper.PaymentMapper;
@@ -25,12 +25,12 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public PaymentEntity insertNewPaymentItem(ConfirmationReservation evt) {
-        PaymentEntity paymentEntity = PaymentMapper.mapFrom(evt);
+    public Payment insertNewPaymentItem(ConfirmationReservation evt) {
+        Payment paymentEntity = PaymentMapper.mapFrom(evt);
         return paymentRepository.save(paymentEntity);
     }
 
-    public Optional<Session> createCheckoutLink(PaymentEntity paymentItem) {
+    public Optional<Session> createCheckoutLink(Payment paymentItem) {
         Session session = null;
         try {
             session = Session.create(
@@ -60,7 +60,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void updatePaymentItemWithCheckoutLink(PaymentEntity paymentItem, Session session) {
+    public void updatePaymentItemWithCheckoutLink(Payment paymentItem, Session session) {
         paymentItem.updateWithCheckoutLink(session);
         paymentRepository.save(paymentItem);
     }

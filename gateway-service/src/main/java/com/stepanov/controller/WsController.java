@@ -2,7 +2,7 @@ package com.stepanov.controller;
 
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderItem;
-import com.stepanov.messaging.publisher.GatewayEventsPublisher;
+import com.stepanov.messaging.publisher.GatewayPublisher;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class WsController {
 
-    private final GatewayEventsPublisher publisher;
+    private final GatewayPublisher publisher;
 
     @MessageMapping("/make-order")
     public void handleCreateOrderEvent(List<OrderItem> orderItems) {

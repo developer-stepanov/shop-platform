@@ -1,8 +1,8 @@
 package com.stepanov.mapper;
 
-import com.stepanov.entity.OrderEntity;
+import com.stepanov.entity.Order;
 
-import com.stepanov.entity.OrderItemEntity;
+import com.stepanov.entity.OrderItem;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.kafka.events.topics.orders.*;
@@ -12,12 +12,12 @@ import java.util.List;
 
 public class OrderMapper {
 
-    public static List<OrderTableItem> fromEntity(List<OrderEntity> orders) {
+    public static List<OrderTableItem> fromEntity(List<Order> orders) {
         return orders.stream()
                 .map(o -> OrderTableItem.builder()
                             .orderId(o.getId())
                             .orderItems(o.getItems().stream()
-                                        .map(it -> OrderItem.builder()
+                                        .map(it -> com.stepanov.kafka.events.topics.orders.OrderItem.builder()
                                                                     .sku(it.getSku())
                                                                     .qty(it.getQty())
                                                                     .build())
@@ -30,16 +30,16 @@ public class OrderMapper {
                 .toList();
     }
 
-    public static OrderEntity toEntity(CreateOrder event) {
+    public static Order toEntity(CreateOrder event) {
 
-        OrderEntity orderEntity = OrderEntity.builder()
+        Order orderEntity = Order.builder()
                         .status(OrderStatus.CREATED)
                         .totalAmount(BigDecimal.ZERO)
                         .currency(Currency.EUR)
                         .build();
 
         event.orderItems().forEach(it -> {
-                orderEntity.addItem(OrderItemEntity.builder()
+                orderEntity.addItem(OrderItem.builder()
                                 .sku(it.sku())
                                 .qty(it.qty())
                                 .unitPrice(BigDecimal.ZERO)
@@ -51,11 +51,11 @@ public class OrderMapper {
         return orderEntity;
     }
 
-    public static OrderAccepted toOrderAccepted(OrderEntity orderEntity) {
+    public static OrderAccepted toOrderAccepted(Order orderEntity) {
         return OrderAccepted.builder()
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()
-                                        .map(it -> OrderItem.builder()
+                                        .map(it -> com.stepanov.kafka.events.topics.orders.OrderItem.builder()
                                                                     .sku(it.getSku())
                                                                     .qty(it.getQty())
                                                                 .build())
@@ -64,11 +64,11 @@ public class OrderMapper {
                 .build();
     }
 
-    public static OrderForStock toOrderForStock(OrderEntity orderEntity) {
+    public static OrderForStock toOrderForStock(Order orderEntity) {
         return OrderForStock.builder()
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()
-                        .map(it -> OrderItem.builder()
+                        .map(it -> com.stepanov.kafka.events.topics.orders.OrderItem.builder()
                                 .sku(it.getSku())
                                 .qty(it.getQty())
                                 .build())

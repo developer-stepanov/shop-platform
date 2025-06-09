@@ -1,6 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.entity.OrderEntity;
+import com.stepanov.entity.Order;
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderAccepted;
 import com.stepanov.kafka.events.topics.orders.OrderForStock;
@@ -24,9 +24,9 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
 @AllArgsConstructor
-public class OrderEventsConsumer {
+public class OrderListener {
 
-    private final OrderEventsPublisher orderEventsPublisher;
+    private final OrderPublisher orderEventsPublisher;
 
     private final OrderService orderService;
 
@@ -34,7 +34,7 @@ public class OrderEventsConsumer {
     @Transactional // make atomic with Kafka changes
     public void onCreateOrder(CreateOrder evt) {
 
-        OrderEntity savedOrder = orderService.createOrder(evt);
+        Order savedOrder = orderService.createOrder(evt);
 
         OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
         OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);

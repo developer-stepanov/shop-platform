@@ -1,7 +1,7 @@
 package com.stepanov.service;
 
-import com.stepanov.entity.ReservationItemEntity;
-import com.stepanov.entity.StockItemEntity;
+import com.stepanov.entity.ReservationItem;
+import com.stepanov.entity.StockItem;
 
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
@@ -16,7 +16,7 @@ import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.kafka.events.topics.stock.PaymentDetails;
 import com.stepanov.mapper.StockMapper;
-import com.stepanov.messaging.StockEventsPublisher;
+import com.stepanov.messaging.StockPublisher;
 
 import com.stepanov.repository.ReservationRepository;
 import com.stepanov.repository.StockRepository;
@@ -34,14 +34,14 @@ import java.util.List;
 @AllArgsConstructor
 public class StockService {
 
-    private final StockEventsPublisher publisher;
+    private final StockPublisher publisher;
 
     private final StockRepository stockRepository;
 
     private final ReservationRepository reservationRepository;
 
     public void itemsForSell() {
-        List<StockItemEntity> stockEntities = stockRepository.findAll();
+        List<StockItem> stockEntities = stockRepository.findAll();
         ItemsForSell items = StockMapper.fromStockItems(stockEntities);
 
         publisher.publishStockItems(items);
@@ -54,7 +54,7 @@ public class StockService {
 
         evt.orderItems().forEach(it -> {
            // Pessimistic lock – prevents oversell
-           StockItemEntity stockItem = stockRepository.lockStockItemBySku(it.sku());
+           StockItem stockItem = stockRepository.lockStockItemBySku(it.sku());
 
            final int itemsToReserve = it.qty();
 
@@ -67,7 +67,7 @@ public class StockService {
            stockItem.decreaseAvailableQty(itemsToReserve);
            stockRepository.save(stockItem); // to run StockItemDomainEventListener
 
-           ReservationItemEntity reservation = ReservationItemEntity.builder()
+           ReservationItem reservation = ReservationItem.builder()
                                                                    .orderId(evt.orderId())
                                                                    .sku(it.sku())
                                                                    .qty(new BigDecimal(itemsToReserve))
@@ -100,14 +100,14 @@ public class StockService {
     public void releaseStockBy(StockRelease evt) {
         evt.orderItems().forEach(it -> {
             // Pessimistic lock ?? do i need it?
-            StockItemEntity stockItem = stockRepository.lockStockItemBySku(it.sku());
+            StockItem stockItem = stockRepository.lockStockItemBySku(it.sku());
 
             final int itemsToRelease = it.qty();
 
             stockItem.increaseAvailableQty(itemsToRelease);
             stockRepository.save(stockItem);
 
-            ReservationItemEntity reservationItem = reservationRepository.findByOrderIdAndSku(evt.orderId(), it.sku());
+            ReservationItem reservationItem = reservationRepository.findByOrderIdAndSku(evt.orderId(), it.sku());
             reservationItem.setReservationStatus(ReservationStatus.RELEASED);
         });
     }

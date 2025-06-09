@@ -17,7 +17,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class StockEventsConsumer {
+public class StockListener {
 
     private final StockService stockService;
 

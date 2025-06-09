@@ -18,7 +18,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_CREATED_TOPIC;
 
 @Component
 @RequiredArgsConstructor
-public class OrderDomainEventListener {
+public class DomainEventListener {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 

@@ -8,12 +8,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class StockItemDomainEventListener {
+public class DomainEventListener {
 
-    private final StockEventsPublisher publisher;
+    private final StockPublisher publisher;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publishStockItemAvailableQtyChanged(StockItemUpdateQty evt) {
+    public void on(StockItemUpdateQty evt) {
         publisher.publishStockItemAvailableQtyChanged(evt);
     }
 }

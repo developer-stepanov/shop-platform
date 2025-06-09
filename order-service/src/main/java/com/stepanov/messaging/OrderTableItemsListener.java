@@ -14,7 +14,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.ORDER_TABLE_ITEMS_CMD_TOPIC;
 @KafkaListener(topics = ORDER_TABLE_ITEMS_CMD_TOPIC)
 public class OrderTableItemsListener {
 
-    private final OrderEventsPublisher orderEventsPublisher;
+    private final OrderPublisher orderEventsPublisher;
 
     private final OrderService orderService;
 

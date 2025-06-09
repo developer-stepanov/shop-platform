@@ -13,7 +13,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_SUCCESS_TOPIC;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class PaymentsPublisher {
+public class PaymentPublisher {
 
     private final KafkaTemplate<String, Object> kafka;
 

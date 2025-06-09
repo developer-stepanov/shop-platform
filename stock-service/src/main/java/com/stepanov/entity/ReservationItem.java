@@ -31,7 +31,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class ReservationItemEntity {
+public class ReservationItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

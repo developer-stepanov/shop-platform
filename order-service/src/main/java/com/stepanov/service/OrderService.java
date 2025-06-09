@@ -1,13 +1,12 @@
 package com.stepanov.service;
 
-import com.stepanov.entity.OrderEntity;
+import com.stepanov.entity.Order;
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderTableItem;
 import com.stepanov.kafka.events.topics.payments.PaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
-import com.stepanov.kafka.events.topics.stock.OrderPriceUpdate;
 import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.repository.OrderRepository;
@@ -34,7 +33,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderEntity createOrder(CreateOrder evt) {
+    public Order createOrder(CreateOrder evt) {
         return orderRepository.save(OrderMapper.toEntity(evt));
     }
 
@@ -51,7 +50,7 @@ public class OrderService {
 
     @Transactional
     public void orderReserved(ConfirmationReservation evt) {
-        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
+        Optional<Order> order = orderRepository.findById(evt.orderId());
         order.ifPresent(it -> {
             // fire OrderReserved
             it.applyReservedStatus(evt);
@@ -64,7 +63,7 @@ public class OrderService {
 
     @Transactional
     public void orderOutOfStock(OutOfStock evt) {
-        Optional<OrderEntity> order = orderRepository.findById((evt.orderId()));
+        Optional<Order> order = orderRepository.findById((evt.orderId()));
         order.ifPresent(it -> {
             it.applyCanceledStatus(OrderDetails.OUT_OF_STOCK);
             //force to send to OrderDomainEventListener
@@ -74,7 +73,7 @@ public class OrderService {
 
     @Transactional
     public void paymentLink(PaymentLink evt) {
-        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
+        Optional<Order> order = orderRepository.findById(evt.orderId());
 
         order.ifPresent(it -> {
             it.applyPaymentLink(evt.checkoutUrl());
@@ -84,7 +83,7 @@ public class OrderService {
 
     @Transactional
     public void orderPaymentSucceeded(PaymentSuccessful evt) {
-        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
+        Optional<Order> order = orderRepository.findById(evt.orderId());
 
         order.ifPresent(it -> {
             it.applyPaidStatus();

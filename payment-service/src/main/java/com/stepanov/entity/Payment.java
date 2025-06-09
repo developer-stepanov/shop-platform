@@ -20,7 +20,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class PaymentEntity extends AbstractAggregateRoot<PaymentEntity> {
+public class Payment extends AbstractAggregateRoot<Payment> {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)   // Hibernate generates UUID-v7

@@ -12,23 +12,23 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 
 @Component
 @AllArgsConstructor
-public class StockEventsPublisher {
+public class StockPublisher {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafka;
 
     public void publishStockItems(ItemsForSell evt) {
-        kafkaTemplate.send(ITEMS_FOR_SELL_TOPIC, evt);
+        kafka.send(ITEMS_FOR_SELL_TOPIC, evt);
     }
 
     public void publishReservedOrder(ConfirmationReservation evt) {
-        kafkaTemplate.send(ORDER_RESERVED_TOPIC, evt.orderId().toString(), evt);
+        kafka.send(ORDER_RESERVED_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publishOutOfStock(OutOfStock evt) {
-        kafkaTemplate.send(OUT_OF_STOCK_TOPIC, evt.orderId().toString(), evt);
+        kafka.send(OUT_OF_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publishStockItemAvailableQtyChanged(StockItemUpdateQty evt) {
-        kafkaTemplate.send(STOCK_ITEM_UPDATE_TOPIC, evt.sku(), evt);
+        kafka.send(STOCK_ITEM_UPDATE_TOPIC, evt.sku(), evt);
     }
 }

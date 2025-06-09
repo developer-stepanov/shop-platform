@@ -39,7 +39,7 @@ import java.util.*;
 @Builder
 @NoArgsConstructor @AllArgsConstructor
 //extends AbstractAggregateRoot to use @DomainEvents aggregator to send it to OrderDomainEventListener
-    public class OrderEntity extends AbstractAggregateRoot<OrderEntity> {
+    public class Order extends AbstractAggregateRoot<Order> {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)   // Hibernate generates UUID-v7
@@ -81,7 +81,7 @@ import java.util.*;
             orphanRemoval = true,
             fetch = FetchType.LAZY)
     @Builder.Default
-    private List<OrderItemEntity> items = new ArrayList<>();
+    private List<OrderItem> items = new ArrayList<>();
 
     @PrePersist void onCreate() {
         createdAt = updatedAt = Instant.now();
@@ -91,7 +91,7 @@ import java.util.*;
         updatedAt = Instant.now();
     }
 
-    public void addItem(OrderItemEntity item) {
+    public void addItem(OrderItem item) {
         items.add(item);
         item.setOrderEntity(this);
     }
@@ -108,7 +108,7 @@ import java.util.*;
         });
 
         this.totalAmount = this.items.stream()
-                                        .map(OrderItemEntity::getUnitPrice)
+                                        .map(OrderItem::getUnitPrice)
                                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         registerEvent(OrderTotalAmountUpdated.builder()

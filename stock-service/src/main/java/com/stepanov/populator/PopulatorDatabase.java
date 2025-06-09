@@ -1,6 +1,6 @@
 package com.stepanov.populator;
 
-import com.stepanov.entity.StockItemEntity;
+import com.stepanov.entity.StockItem;
 import com.stepanov.enums.Currency;
 import com.stepanov.repository.StockRepository;
 
@@ -32,7 +32,7 @@ public class PopulatorDatabase implements ApplicationRunner {
         log.info("Populating database with initial stock …");
 
         stockRepository.save(
-                StockItemEntity.builder()
+                StockItem.builder()
                         .sku("SKU-001")
                         .name("MacBook Pro")
                         .description("Nice laptop!")
@@ -42,7 +42,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .build());
 
         stockRepository.save(
-                StockItemEntity.builder()
+                StockItem.builder()
                         .sku("SKU-002")
                         .name("Iphone 16")
                         .description("Good choice")
@@ -52,7 +52,7 @@ public class PopulatorDatabase implements ApplicationRunner {
                         .build());
 
         stockRepository.save(
-                StockItemEntity.builder()
+                StockItem.builder()
                         .sku("SKU-003")
                         .name("MacBook Air")
                         .description("Affordable laptop")

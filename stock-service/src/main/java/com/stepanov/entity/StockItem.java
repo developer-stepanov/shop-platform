@@ -21,7 +21,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class StockItemEntity extends AbstractAggregateRoot<StockItemEntity>  {
+public class StockItem extends AbstractAggregateRoot<StockItem>  {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)

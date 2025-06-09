@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record OrderPaymentLinkUpdate(UUID orderId, String paymentLink) {
-}
+public record OrderPaymentLinkUpdate(UUID orderId,
+                                     String paymentLink) { }

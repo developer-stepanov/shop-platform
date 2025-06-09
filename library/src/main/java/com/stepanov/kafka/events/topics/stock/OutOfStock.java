@@ -5,5 +5,4 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record OutOfStock(UUID orderId) {
-}
+public record OutOfStock(UUID orderId) {}

@@ -6,5 +6,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record PayUntil(UUID orderId, Instant payUntil) {
-}
+public record PayUntil(UUID orderId,
+                       Instant payUntil) {}

@@ -10,5 +10,4 @@ import java.util.UUID;
 public record OrderAccepted(
         UUID orderId,
         List<OrderItem> orderItems,
-        OrderStatus orderStatus
-) {}
+        OrderStatus orderStatus) {}

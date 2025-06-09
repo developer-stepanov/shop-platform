@@ -14,5 +14,4 @@ public record OrderTableItem(UUID orderId,
                              BigDecimal totalAmount,
                              OrderStatus orderStatus,
                              OrderDetails details,
-                             String paymentLink) {
-}
+                             String paymentLink) {}

@@ -26,44 +26,44 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 @AllArgsConstructor
 public class OrderListener {
 
-    private final OrderPublisher orderEventsPublisher;
+    private final OrderPublisher publisher;
 
     private final OrderService orderService;
 
     @KafkaListener(topics = ORDER_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes
-    public void onCreateOrder(CreateOrder evt) {
+    public void on(CreateOrder evt) {
 
         Order savedOrder = orderService.createOrder(evt);
 
         OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
         OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
 
-        orderEventsPublisher.publishOrderAccepted(orderAccepted);
-        orderEventsPublisher.publishOrderForStock(orderForStock);
+        publisher.publishOrderAccepted(orderAccepted);
+        publisher.publishOrderForStock(orderForStock);
     }
 
     @KafkaListener(topics = ORDER_RESERVED_TOPIC)
     @Transactional
-    public void onOrderReserved(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void on(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         orderService.orderReserved(evt);
     }
 
     @KafkaListener(topics = OUT_OF_STOCK_TOPIC)
     @Transactional
-    public void onOrderOutOfStock(OutOfStock evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void on(OutOfStock evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
        orderService.orderOutOfStock(evt);
     }
 
     @KafkaListener(topics = PAYMENT_LINK_TOPIC)
     @Transactional
-    public void onPaymentLink(PaymentLink evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void on(PaymentLink evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         orderService.paymentLink(evt);
     }
 
     @KafkaListener(topics = PAYMENT_SUCCESS_TOPIC)
     @Transactional
-    public void onPaymentSucceeded(PaymentSuccessful evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void on(PaymentSuccessful evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         orderService.orderPaymentSucceeded(evt);
     }
 }

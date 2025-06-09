@@ -8,5 +8,4 @@ import java.util.UUID;
 @Builder
 public record OrderForStock(
         UUID orderId,
-        List<OrderItem> orderItems
-) {}
+        List<OrderItem> orderItems) {}

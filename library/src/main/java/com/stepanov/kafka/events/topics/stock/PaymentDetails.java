@@ -6,5 +6,4 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-public record PaymentDetails(BigDecimal totalPayment, Currency currency) {
-}
+public record PaymentDetails(BigDecimal totalPayment, Currency currency) {}

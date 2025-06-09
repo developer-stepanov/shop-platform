@@ -1,9 +1,7 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.topics.orders.OrderAccepted;
-import com.stepanov.kafka.events.topics.orders.OrderForStock;
-import com.stepanov.kafka.events.topics.orders.OrderTableItem;
-import com.stepanov.kafka.events.topics.orders.StockRelease;
+import com.stepanov.kafka.events.topics.orders.*;
+import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -32,6 +30,30 @@ public class OrderPublisher {
 
     public void publishStockRelease(StockRelease evt) {
         kafkaTemplate.send(STOCK_RELEASE_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishOrderPriceUpdate(OrderTotalAmountUpdated evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishOrderReserved(OrderReserved evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishOrderCancelled(OrderCancelled evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishOrderPaymentLinkUpdate(OrderPaymentLinkUpdate evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishOrderPaid(OrderPaid evt) {
+        kafkaTemplate.send(ORDER_UPDATED_TOPIC, evt.orderId().toString(), evt);
+    }
+
+    public void publishConfirmationToPayment(ConfirmationReservation evt) {
+        kafkaTemplate.send(PAYMENT_CREATED_TOPIC, evt.orderId().toString(), evt);
     }
 
 }

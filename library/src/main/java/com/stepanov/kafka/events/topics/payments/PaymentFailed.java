@@ -6,5 +6,5 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record PaymentFailed(UUID orderId, PaymentStatus paymentStatus) {
-}
+public record PaymentFailed(UUID orderId,
+                            PaymentStatus paymentStatus) {}

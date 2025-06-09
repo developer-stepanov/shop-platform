@@ -24,7 +24,7 @@ public class PaymentListener {
 
     @KafkaListener(topics = PAYMENT_CREATED_TOPIC)
     @Transactional // make atomic with Kafka changes
-    public void onCreateOrder(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    public void on(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         Payment paymentItem = paymentService.insertNewPaymentItem(evt);
         Session stripeSession = paymentService.createCheckoutLink(paymentItem)
                                     .orElseThrow(() -> new EmptyStripeSession("OrderId: " + evt.orderId()));

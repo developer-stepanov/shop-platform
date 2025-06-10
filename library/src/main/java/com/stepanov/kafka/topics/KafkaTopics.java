@@ -23,8 +23,9 @@ public class KafkaTopics {
 
     // +
     public static final String ORDER_RELEASE_STOCK_TOPIC = "order.release-stock.v1";
-    // +
-    public static final String STOCK_SKU_QTY_UPDATE_TOPIC = "stock.sku-qty-update.v1";
+
+    public static final String STOCK_PRODUCT_SYNC_TOPIC = "stock.product-sync.v1";
+
     // +
     public static final String ORDER_NOTIFY_PAYMENT_TOPIC = "order.notify-payment.v1";
     // +
@@ -35,8 +36,7 @@ public class KafkaTopics {
 
     // -
     public static final String GATEWAY_COMMAND_FETCH_PRODUCTS_TOPIC = "gateway.command-fetch-products.v1";
-    // -
-    public static final String STOCK_FETCHED_PRODUCTS_TOPIC = "stock.fetched-products.v1";
+
 
 
     // NOT USED

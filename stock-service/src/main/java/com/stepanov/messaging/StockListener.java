@@ -21,13 +21,13 @@ public class StockListener {
 
     private final StockService stockService;
 
-    @KafkaListener(topics = GIVE_ITEMS_FOR_SELL_TOPIC)
-    public void onGiveItemsForSellEvent(ItemsForSellCmd evt) {
+    @KafkaListener(topics = GATEWAY_COMMAND_FETCH_PRODUCTS_TOPIC)
+    public void on(ItemsForSellCmd evt) {
         stockService.itemsForSell();
     }
 
-    @KafkaListener(topics = ORDER_FOR_STOCK_TOPIC)
-    public void onReserveItemsEvent(OrderForStock evt) {
+    @KafkaListener(topics = ORDER_RESERVE_ORDER_TOPIC)
+    public void on(OrderForStock evt) {
         try {
             stockService.reserveBy(evt);
         } catch(OutOfStockException e) {
@@ -35,8 +35,8 @@ public class StockListener {
         }
     }
 
-    @KafkaListener(topics = STOCK_RELEASE_TOPIC)
-    public void onStockReleaseEvent(StockRelease evt) {
+    @KafkaListener(topics = ORDER_RELEASE_STOCK_TOPIC)
+    public void on(StockRelease evt) {
        stockService.releaseStockBy(evt);
     }
 

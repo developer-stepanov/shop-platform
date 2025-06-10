@@ -7,11 +7,11 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_TABLE_ITEMS_CMD_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.GATEWAY_COMMAND_FETCH_ORDERS_TOPIC;
 
 @Service
 @AllArgsConstructor
-@KafkaListener(topics = ORDER_TABLE_ITEMS_CMD_TOPIC)
+@KafkaListener(topics = GATEWAY_COMMAND_FETCH_ORDERS_TOPIC)
 public class OrderTableItemsListener {
 
     private final OrderPublisher orderEventsPublisher;

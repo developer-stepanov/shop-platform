@@ -13,7 +13,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_CREATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_NOTIFY_PAYMENT_TOPIC;
 
 @Component
 @AllArgsConstructor
@@ -22,7 +22,7 @@ public class PaymentListener {
 
     private final PaymentService paymentService;
 
-    @KafkaListener(topics = PAYMENT_CREATED_TOPIC)
+    @KafkaListener(topics = ORDER_NOTIFY_PAYMENT_TOPIC)
     @Transactional // make atomic with Kafka changes
     public void on(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         Payment paymentItem = paymentService.insertNewPaymentItem(evt);

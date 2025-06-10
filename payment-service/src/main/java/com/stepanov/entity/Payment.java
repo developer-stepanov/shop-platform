@@ -3,7 +3,7 @@ package com.stepanov.entity;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.PaymentMethod;
 import com.stepanov.enums.PaymentStatus;
-import com.stepanov.kafka.events.topics.payments.PaymentLink;
+import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.*;
@@ -80,7 +80,7 @@ public class Payment extends AbstractAggregateRoot<Payment> {
         this.setStripeCheckoutUrl(s.getUrl());
         this.setPaymentStatus(PaymentStatus.LINK_SENT);
 
-        registerEvent(PaymentLink.builder()
+        registerEvent(CheckoutPaymentLink.builder()
                             .orderId(this.orderId)
                             .checkoutUrl(this.stripeCheckoutUrl)
                             .build());

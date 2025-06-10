@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ITEMS_FOR_SELL_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.STOCK_FETCHED_PRODUCTS_TOPIC;
 
 @Service
 @AllArgsConstructor
-@KafkaListener(topics = ITEMS_FOR_SELL_TOPIC)
+@KafkaListener(topics = STOCK_FETCHED_PRODUCTS_TOPIC)
 public class ItemsForSellTopicListener {
 
     private final SimpMessagingTemplate broker;

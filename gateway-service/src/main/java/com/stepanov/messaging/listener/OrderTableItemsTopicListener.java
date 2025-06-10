@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_TABLE_ITEMS_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_FETCHED_ORDERS_TOPIC;
 
 @Service
 @AllArgsConstructor
-@KafkaListener(topics = ORDER_TABLE_ITEMS_TOPIC)
+@KafkaListener(topics = ORDER_FETCHED_ORDERS_TOPIC)
 public class OrderTableItemsTopicListener {
 
     private final SimpMessagingTemplate broker;

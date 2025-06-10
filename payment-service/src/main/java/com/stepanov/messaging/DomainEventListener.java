@@ -1,6 +1,6 @@
 package com.stepanov.messaging;
 
-import com.stepanov.kafka.events.topics.payments.PaymentLink;
+import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class DomainEventListener {
     private final PaymentPublisher publisher;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void on(PaymentLink evt) {
+    public void on(CheckoutPaymentLink evt) {
         publisher.publish(evt);
     }
 

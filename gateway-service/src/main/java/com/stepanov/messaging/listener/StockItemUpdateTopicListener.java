@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-import static com.stepanov.kafka.topics.KafkaTopics.STOCK_ITEM_UPDATE_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.STOCK_SKU_QTY_UPDATE_TOPIC;
 
 @Service
 @AllArgsConstructor
-@KafkaListener(topics = STOCK_ITEM_UPDATE_TOPIC)
+@KafkaListener(topics = STOCK_SKU_QTY_UPDATE_TOPIC)
 public class StockItemUpdateTopicListener {
 
     private final SimpMessagingTemplate broker;

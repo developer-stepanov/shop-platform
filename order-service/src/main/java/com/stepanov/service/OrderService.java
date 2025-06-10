@@ -4,7 +4,7 @@ import com.stepanov.entity.Order;
 import com.stepanov.enums.OrderDetails;
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderTableItem;
-import com.stepanov.kafka.events.topics.payments.PaymentLink;
+import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.kafka.events.topics.stock.OutOfStock;
@@ -72,7 +72,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void paymentLink(PaymentLink evt) {
+    public void paymentLink(CheckoutPaymentLink evt) {
         Optional<Order> order = orderRepository.findById(evt.orderId());
 
         order.ifPresent(it -> {

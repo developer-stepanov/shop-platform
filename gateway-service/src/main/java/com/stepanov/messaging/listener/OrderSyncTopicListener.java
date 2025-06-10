@@ -9,16 +9,33 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_ORDER_UPDATED_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_ORDER_SYNC_TOPIC;
 
 @Service
 @AllArgsConstructor
-@KafkaListener(topics = ORDER_ORDER_UPDATED_TOPIC)
-public class OrderUpdatedTopicListener {
+@KafkaListener(topics = ORDER_ORDER_SYNC_TOPIC)
+public class OrderSyncTopicListener {
 
     private final SimpMessagingTemplate broker;
+
+    @KafkaHandler
+    void on(List<OrderTableItem> evt) {
+
+        broker.convertAndSend("/topic/events",
+                evt,
+                Map.of("event-type", evt.getClass().getSimpleName()));
+    }
+
+    @KafkaHandler
+    void on(OrderAccepted evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+
+        broker.convertAndSend("/topic/events",
+                evt,
+                Map.of("event-type", evt.getClass().getSimpleName()));
+    }
 
     @KafkaHandler
     void on(OrderTotalAmountUpdated evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {

@@ -16,15 +16,15 @@ public class GatewayPublisher {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void createOrderCmd(CreateOrder evt) {
-        kafkaTemplate.send(GATEWAY_COMMAND_CREATE_ORDER_TOPIC, evt);
-    }
-
-    public void fetchProductsCmd() {
-        kafkaTemplate.send(GATEWAY_COMMAND_FETCH_PRODUCTS_TOPIC, new ItemsForSellCmd());
+        kafkaTemplate.send(GATEWAY_COMMAND_ORDER_TOPIC, evt);
     }
 
     public void fetchOrdersCmd() {
-        kafkaTemplate.send(GATEWAY_COMMAND_FETCH_ORDERS_TOPIC, new OrderTableItemCmd());
+        kafkaTemplate.send(GATEWAY_COMMAND_ORDER_TOPIC, new OrderTableItemCmd());
+    }
+
+    public void fetchProductsCmd() {
+        kafkaTemplate.send(GATEWAY_COMMAND_STOCK_TOPIC, new ItemsForSellCmd());
     }
 
 }

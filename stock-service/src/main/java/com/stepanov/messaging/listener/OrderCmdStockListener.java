@@ -1,14 +1,14 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.listener;
 
 import com.stepanov.exceptions.OutOfStockException;
 import com.stepanov.kafka.events.topics.orders.OrderForStock;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
-import com.stepanov.kafka.events.topics.stock.ItemsForSellCmd;
 import com.stepanov.service.StockService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -17,16 +17,12 @@ import static com.stepanov.kafka.topics.KafkaTopics.*;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class StockListener {
+@KafkaListener(topics = ORDER_COMMAND_STOCK_TOPIC)
+public class OrderCmdStockListener {
 
     private final StockService stockService;
 
-    @KafkaListener(topics = GATEWAY_COMMAND_FETCH_PRODUCTS_TOPIC)
-    public void on(ItemsForSellCmd evt) {
-        stockService.itemsForSell();
-    }
-
-    @KafkaListener(topics = ORDER_RESERVE_ORDER_TOPIC)
+    @KafkaHandler
     public void on(OrderForStock evt) {
         try {
             stockService.reserveBy(evt);
@@ -35,7 +31,7 @@ public class StockListener {
         }
     }
 
-    @KafkaListener(topics = ORDER_RELEASE_STOCK_TOPIC)
+    @KafkaHandler
     public void on(StockRelease evt) {
        stockService.releaseStockBy(evt);
     }

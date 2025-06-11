@@ -1,7 +1,8 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.listener;
 
 import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
+import com.stepanov.messaging.publisher.PaymentPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

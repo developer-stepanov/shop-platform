@@ -2,35 +2,17 @@ package com.stepanov.kafka.topics;
 
 public class KafkaTopics {
 
-    public static final String GATEWAY_COMMAND_CREATE_ORDER_TOPIC = "gateway.command-create-order.v1";
-    public static final String GATEWAY_COMMAND_FETCH_ORDERS_TOPIC = "gateway.command-fetch-orders.v1";
-    public static final String GATEWAY_COMMAND_FETCH_PRODUCTS_TOPIC = "gateway.command-fetch-products.v1";
+    public static final String GATEWAY_COMMAND_ORDER_TOPIC = "gateway.command-order.v1";
+    public static final String GATEWAY_COMMAND_STOCK_TOPIC = "gateway.command-stock.v1";
+    public static final String ORDER_COMMAND_STOCK_TOPIC = "order.command-stock.v1";
 
-    public static final String ORDER_RESERVE_ORDER_TOPIC = "order.reserve-order.v1";
-
-    //
+    public static final String ORDER_PREPARE_PAYMENT_TOPIC = "order.prepare-payment.v1";
     public static final String ORDER_ORDER_SYNC_TOPIC = "order.order-sync.v1";
 
-//    public static final String ORDER_ORDER_ACCEPTED_TOPIC = "order.order-accepted.v1";
-//    public static final String ORDER_ORDER_UPDATED_TOPIC = "order.order-updated.v1";
-//    public static final String ORDER_FETCHED_ORDERS_TOPIC = "order.fetched-orders.v1";
-
-
-    public static final String ORDER_RELEASE_STOCK_TOPIC = "order.release-stock.v1";
-    //order prepare payment topic
-    public static final String ORDER_NOTIFY_PAYMENT_TOPIC = "order.notify-payment.v1";
-
-
-    //
-    public static final String STOCK_PRODUCT_SYNC_TOPIC = "stock.product-sync.v1";
     public static final String STOCK_RESERVATION_STATUS_TOPIC = "stock.reservation-status.v1";
+    public static final String STOCK_PRODUCT_SYNC_TOPIC = "stock.product-sync.v1";
 
-
-    //
-    public static final String PAYMENT_CHECKOUT_PAYMENT_LINK_TOPIC = "payment.checkout-payment-link.v1";
-    public static final String PAYMENT_PAYMENT_STATUS_TOPIC = "payment.payment-status.v1";
-
-
+    public static final String PAYMENT_NOTIFICATION_TOPIC = "payment.notification.v1";
 
     // NOT USED
     public static final String ORDER_CANCELLED_TOPIC = "order-cancelled.v1";

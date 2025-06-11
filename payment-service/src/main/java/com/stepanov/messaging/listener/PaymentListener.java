@@ -1,4 +1,4 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.listener;
 
 import com.stepanov.entity.Payment;
 import com.stepanov.exceptions.EmptyStripeSession;
@@ -13,7 +13,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stepanov.kafka.topics.KafkaTopics.ORDER_NOTIFY_PAYMENT_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_PREPARE_PAYMENT_TOPIC;
 
 @Component
 @AllArgsConstructor
@@ -22,7 +22,7 @@ public class PaymentListener {
 
     private final PaymentService paymentService;
 
-    @KafkaListener(topics = ORDER_NOTIFY_PAYMENT_TOPIC)
+    @KafkaListener(topics = ORDER_PREPARE_PAYMENT_TOPIC)
     @Transactional // make atomic with Kafka changes
     public void on(ConfirmationReservation evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         Payment paymentItem = paymentService.insertNewPaymentItem(evt);

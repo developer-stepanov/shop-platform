@@ -1,17 +1,17 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.listener;
 
 import com.stepanov.enums.OrderStatus;
 
 import com.stepanov.kafka.events.topics.orders.*;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.messaging.publisher.OrderPublisher;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Component;
-
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class DomainEventListener {
 

@@ -6,7 +6,7 @@ import com.stepanov.enums.OrderStatus;
 import com.stepanov.exceptions.NotFoundEntityException;
 import com.stepanov.kafka.events.topics.orders.OrderItem;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
-import com.stepanov.messaging.OrderPublisher;
+import com.stepanov.messaging.publisher.OrderPublisher;
 import com.stepanov.repository.OrderRepository;
 import lombok.AllArgsConstructor;
 import org.quartz.Job;

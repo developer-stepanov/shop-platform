@@ -1,31 +1,31 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.publisher;
 
 import com.stepanov.kafka.events.topics.orders.*;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.stepanov.kafka.topics.KafkaTopics.*;
 
-@Component
+@Service
 @AllArgsConstructor
 public class OrderPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void publish(OrderForStock evt) {
-        kafkaTemplate.send(ORDER_RESERVE_ORDER_TOPIC, evt.orderId().toString(), evt);
+        kafkaTemplate.send(ORDER_COMMAND_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publish(StockRelease evt) {
-        kafkaTemplate.send(ORDER_RELEASE_STOCK_TOPIC, evt.orderId().toString(), evt);
+        kafkaTemplate.send(ORDER_COMMAND_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publish(ConfirmationReservation evt) {
-        kafkaTemplate.send(ORDER_NOTIFY_PAYMENT_TOPIC, evt.orderId().toString(), evt);
+        kafkaTemplate.send(ORDER_PREPARE_PAYMENT_TOPIC, evt.orderId().toString(), evt);
     }
 
     public void publish(List<OrderTableItem> evt) {

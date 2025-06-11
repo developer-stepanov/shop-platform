@@ -17,7 +17,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.ORDER_ORDER_SYNC_TOPIC;
 @Service
 @AllArgsConstructor
 @KafkaListener(topics = ORDER_ORDER_SYNC_TOPIC)
-public class OrderSyncTopicListener {
+public class OrderSyncListener {
 
     private final SimpMessagingTemplate broker;
 

@@ -1,4 +1,4 @@
-package com.stepanov.messaging;
+package com.stepanov.messaging.publisher;
 
 import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;

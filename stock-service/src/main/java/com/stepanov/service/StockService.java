@@ -16,7 +16,7 @@ import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.kafka.events.topics.stock.PaymentDetails;
 import com.stepanov.mapper.StockMapper;
-import com.stepanov.messaging.StockPublisher;
+import com.stepanov.messaging.publisher.StockPublisher;
 
 import com.stepanov.repository.ReservationRepository;
 import com.stepanov.repository.StockRepository;

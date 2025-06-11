@@ -17,7 +17,7 @@ import static com.stepanov.kafka.topics.KafkaTopics.STOCK_PRODUCT_SYNC_TOPIC;
 @Service
 @AllArgsConstructor
 @KafkaListener(topics = STOCK_PRODUCT_SYNC_TOPIC)
-public class ProductSyncTopicListener {
+public class ProductSyncListener {
 
     private final SimpMessagingTemplate broker;
 

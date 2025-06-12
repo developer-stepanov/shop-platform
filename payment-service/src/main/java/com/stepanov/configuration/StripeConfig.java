@@ -15,6 +15,8 @@ public class StripeConfig {
     private String apiKey;
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
+    @Value("${stripe.payment-confirmation.url}")
+    private String paymentConfirmationUrl;
 
     @PostConstruct
     void init() { com.stripe.Stripe.apiKey = apiKey; }

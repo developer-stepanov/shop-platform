@@ -13,8 +13,4 @@ public class KafkaTopics {
     public static final String STOCK_PRODUCT_SYNC_TOPIC = "stock.product-sync.v1";
 
     public static final String PAYMENT_NOTIFICATION_TOPIC = "payment.notification.v1";
-
-    // NOT USED
-    public static final String ORDER_CANCELLED_TOPIC = "order-cancelled.v1";
-    public static final String ORDER_PRICE_UPDATED_TOPIC = "order-price-updated.v1";
 }

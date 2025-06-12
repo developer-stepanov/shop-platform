@@ -13,9 +13,4 @@ public class PaymentConfirmationController {
         return "redirect:/payment-confirmation.html";
     }
 
-    @GetMapping("/failed")
-    public String redirectToFailedPage() {
-        return "redirect:/payment-failed.html";
-    }
-
 }

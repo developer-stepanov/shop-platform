@@ -1,5 +1,6 @@
 package com.stepanov.service;
 
+import com.stepanov.configuration.StripeConfig;
 import com.stepanov.entity.Payment;
 import com.stepanov.enums.PaymentStatus;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
@@ -20,6 +21,8 @@ import java.util.Optional;
 @Slf4j
 public class PaymentService {
 
+    private final StripeConfig config;
+
     private final static String METADATA_ORDER_ID = "orderId";
 
     private final PaymentRepository paymentRepository;
@@ -35,22 +38,20 @@ public class PaymentService {
         try {
             session = Session.create(
                     SessionCreateParams.builder()
-                            .setMode(SessionCreateParams.Mode.PAYMENT)
-                            .setSuccessUrl("http://localhost:8080/payment/confirmation") // change to gateway controller to show that
-                                                                    // payment is successful
-                            .putMetadata(METADATA_ORDER_ID, paymentItem.getOrderId().toString())
-                            .addLineItem(SessionCreateParams.LineItem.builder()
-                                    .setQuantity(1L)
-                                    .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                            .setCurrency(paymentItem.getCurrency().toString())
-                                            // value in cents
-                                            .setUnitAmount(100 * paymentItem.getTotalPayment().longValue())
-                                            .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                    .setName("Order: " + paymentItem.getOrderId().toString())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(config.getPaymentConfirmationUrl())
+                        .putMetadata(METADATA_ORDER_ID, paymentItem.getOrderId().toString())
+                        .addLineItem(SessionCreateParams.LineItem.builder()
+                                .setQuantity(1L)
+                                .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency(paymentItem.getCurrency().toString())
+                                        .setUnitAmount(valueInCents(paymentItem.getTotalPayment().longValue()))
+                                        .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                .setName(orderName(paymentItem.getOrderId().toString()))
+                                                .build())
+                                        .build())
+                                .build())
+                        .build()
             );
         } catch (StripeException e) {
             log.error("Stripe payment session can not be created for orderId: {}", paymentItem.getOrderId());
@@ -76,5 +77,13 @@ public class PaymentService {
             it.markPaymentAsSucceeded(session.getPaymentIntent());
             paymentRepository.save(it);
         });
+    }
+
+    private static long valueInCents(long value) {
+        return 100 * value;
+    }
+
+    private static String orderName(String name) {
+        return String.format("Order: %s", name);
     }
 }

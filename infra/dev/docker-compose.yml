@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  kafka-dev-service:
+    image: bitnami/kafka:4.0           # official Bitnami image with KRaft
+    container_name: kafka-dev
+    hostname: kafka                    # broker’s host name inside the network
+    ports:
+      - "9092:9092"                    # internal traffic
+      - "29092:29092"                  # host <-> broker
+    environment:
+      # 1  Basic KRaft bootstrap
+      KAFKA_CLUSTER_ID: Oo03OEVBNTcwOTJEMUM0qj   # any 22‑char base64 string
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # 2  Listeners
+      KAFKA_CFG_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+    volumes:
+      - kafka_data_dev:/bitnami/kafka                # persists logs between restarts
+
+  kafka-ui-dev-service:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui-dev
+    depends_on:
+      - kafka-dev-service
+    ports:
+      - "9000:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: sandbox
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  order-db-dev-service:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: order-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - order_dev_pg_data:/var/lib/postgresql/data
+
+  stock-db-dev-service:
+    image: postgres:16
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: stock-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - stock_dev_pg_data:/var/lib/postgresql/data
+
+  payment-db-dev-service:
+    image: postgres:16
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: payment-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - payment_dev_pg_data:/var/lib/postgresql/data
+
+volumes:
+  kafka_data_dev:
+  order_dev_pg_data:
+  stock_dev_pg_data:
+  payment_dev_pg_data:
+
+networks:
+  default:
+    driver: bridge

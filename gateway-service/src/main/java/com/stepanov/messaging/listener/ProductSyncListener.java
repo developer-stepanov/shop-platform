@@ -23,17 +23,20 @@ public class ProductSyncListener {
 
     @KafkaHandler
     void on(ItemsForSell evt) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+        send(evt);
     }
 
     @KafkaHandler
     void on(StockItemUpdateQty evt, @Header(KafkaHeaders.RECEIVED_KEY) String sku) {
+        send(evt);
+    }
 
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+    private static Map<String, Object> mapHeaders(String className) {
+        return Map.of("event-type", className);
+    }
+
+    private void send(Object payload) {
+        final String destination = "/topic/events";
+        broker.convertAndSend(destination, payload, mapHeaders(payload.getClass().getSimpleName()));
     }
 }

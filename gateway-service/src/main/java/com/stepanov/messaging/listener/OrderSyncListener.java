@@ -23,61 +23,45 @@ public class OrderSyncListener {
 
     @KafkaHandler
     void on(List<OrderTableItem> evt) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+        send(evt);
     }
 
     @KafkaHandler
     void on(OrderAccepted evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+        send(evt);
     }
 
     @KafkaHandler
     void on(OrderTotalAmountUpdated evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+        send(evt);
     }
 
     @KafkaHandler
-    void on(OrderReserved evt,
-            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+    void on(OrderReserved evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        send(evt);
     }
 
     @KafkaHandler
-    void on(OrderCancelled evt,
-            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+    void on(OrderCancelled evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        send(evt);
     }
 
     @KafkaHandler
-    void on(OrderPaymentLinkUpdate evt,
-            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
-
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+    void on(OrderPaymentLinkUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        send(evt);
     }
 
     @KafkaHandler
-    void on(OrderPaid evt,
-            @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(OrderPaid evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+        send(evt);
+    }
 
-        broker.convertAndSend("/topic/events",
-                evt,
-                Map.of("event-type", evt.getClass().getSimpleName()));
+    private static Map<String, Object> mapHeaders(String className) {
+        return Map.of("event-type", className);
+    }
+
+    private void send(Object payload) {
+        final String destination = "/topic/events";
+        broker.convertAndSend(destination, payload, mapHeaders(payload.getClass().getSimpleName()));
     }
 }

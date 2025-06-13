@@ -1,10 +1,9 @@
-server.port: 8081
 spring:
-  application.name: order-service
+  application.name: stock-service
 
   # --- Postgres wiring ---
   datasource:
-    url: jdbc:postgresql://localhost:5432/order-db   # host is the Compose service name
+    url: jdbc:postgresql://stock-db-service:5432/stock-db
     username: user
     password: user
     driver-class-name: org.postgresql.Driver
@@ -12,7 +11,7 @@ spring:
   # --- JPA ---
   jpa:
     hibernate:
-      ddl-auto: validate                           # schema managed by Liquibase
+      ddl-auto: validate # schema managed by Liquibase
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -23,19 +22,9 @@ spring:
     enabled: true
     default-schema: public
 
-  # --- Quartz wiring ---
-  quartz:
-    # Persist jobs & triggers in the database
-    job-store-type: jdbc
-    jdbc:
-      # to not run the bundled DDL script every time
-      initialize-schema: never
-    properties:
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
-
   # --- Kafka wiring ---
   kafka:
-    bootstrap-servers: localhost:29092      # change to kafka:9092 in Docker/K8s
+    bootstrap-servers: kafka:9092 # change to kafka:9092 in Docker/K8s
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

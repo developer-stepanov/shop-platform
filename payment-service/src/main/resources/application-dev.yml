@@ -1,0 +1,44 @@
+server.port: 8083
+
+# --- Stripe wiring ---
+stripe:
+  api-key: sk_test_51RIYzHRr9jDe8gOjt9XvxrEbUWkn5zAFQB8qECZ4Fw0gOHWCHWx3rOdISKYlEIP0cilM192iVEI7CctOkelgHGCu00kjsoaGz3
+  webhook-secret: whsec_3efb63c2bd327e87f6540d5ed9fbb754477b18c071858c8e0e1b6a4ae35c0db8
+  payment-confirmation.url: http://localhost:8080/payment/confirmation
+
+spring:
+  application.name: payment-service
+  # --- Postgres wiring ---
+  datasource:
+    url: jdbc:postgresql://localhost:5434/payment-db
+    username: user
+    password: user
+    driver-class-name: org.postgresql.Driver
+
+  # --- JPA wiring ---
+  jpa:
+    hibernate:
+      ddl-auto: validate                        # schema managed by Liquibase
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- Liquibase wiring ---
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+    enabled: true
+    default-schema: public
+
+  # --- Kafka wiring ---
+  kafka:
+    bootstrap-servers: kafka:9092      # change to kafka:9092 in Docker/K8s
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      # allow any package for JsonDeserializer
+      spring.json.trusted.packages: '*'

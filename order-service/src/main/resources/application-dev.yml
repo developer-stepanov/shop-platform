@@ -1,24 +1,18 @@
-server.port: 8083
-
-# --- Stripe wiring ---
-stripe:
-  api-key: sk_test_51RIYzHRr9jDe8gOjt9XvxrEbUWkn5zAFQB8qECZ4Fw0gOHWCHWx3rOdISKYlEIP0cilM192iVEI7CctOkelgHGCu00kjsoaGz3
-  webhook-secret: whsec_3efb63c2bd327e87f6540d5ed9fbb754477b18c071858c8e0e1b6a4ae35c0db8
-  payment-confirmation.url: http://localhost:8080/payment/confirmation
-
+server.port: 8081
 spring:
-  application.name: payment-service
+  application.name: order-service
+
   # --- Postgres wiring ---
   datasource:
-    url: jdbc:postgresql://localhost:5434/payment-db
+    url: jdbc:postgresql://localhost:5432/order-db
     username: user
     password: user
     driver-class-name: org.postgresql.Driver
 
-  # --- JPA wiring ---
+  # --- JPA ---
   jpa:
     hibernate:
-      ddl-auto: validate                        # schema managed by Liquibase
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -29,9 +23,19 @@ spring:
     enabled: true
     default-schema: public
 
+  # --- Quartz wiring ---
+  quartz:
+    # Persist jobs & triggers in the database
+    job-store-type: jdbc
+    jdbc:
+      # to not run the bundled DDL script every time
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
   # --- Kafka wiring ---
   kafka:
-    bootstrap-servers: localhost:29092      # change to kafka:9092 in Docker/K8s
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

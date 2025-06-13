@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+#  kafka service wiring
+  kafka:
+    image: bitnami/kafka:4.0           # official Bitnami image with KRaft
+    container_name: kafka
+    hostname: kafka                    # broker’s host name inside the network
+    ports:
+      - "9092:9092"
+    environment:
+      # 1  KRaft bootstrap
+      KAFKA_CLUSTER_ID: MkU3OEVBNTcwNTJENUM0Qj   # any 22‑char base64 string
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # 2  Listeners
+      KAFKA_CFG_LISTENERS: INTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"     # should be done manually or with a script in real PROD!
+
+    volumes:
+      - kafka_data:/bitnami/kafka
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "9000:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: shop-platform-kafka
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+# gateway wiring
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
+# order service wiring
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8081:8080"
+    depends_on:
+      - kafka
+      - order-db-service
+
+  order-db-service:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: order-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - order_pg_data:/var/lib/postgresql/data
+
+# stock service wiring
+  stock-service:
+    build:
+      context: ./stock-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8082:8080"
+    depends_on:
+      - kafka
+      - stock-db-service
+
+  stock-db-service:
+    image: postgres:16
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: stock-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - stock_pg_data:/var/lib/postgresql/data
+
+# payment service wiring
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8083:8080"
+    depends_on:
+      - kafka
+      - payment-db-service
+
+  payment-db-service:
+    image: postgres:16
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: payment-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    volumes:
+      - payment_pg_data:/var/lib/postgresql/data
+
+volumes:
+  kafka_data:
+  order_pg_data:
+  stock_pg_data:
+  payment_pg_data:
+
+networks:
+  default:
+    driver: bridge

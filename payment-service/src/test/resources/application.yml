@@ -1,0 +1,23 @@
+spring:
+  application.name: payment-service
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      # allow any package for JsonDeserializer
+      spring.json.trusted.packages: '*'
+
+stripe:
+  api-key: sk_test_51RIYzHRr9jDe8gOjt9XvxrEbUWkn5zAFQB8qECZ4Fw0gOHWCHWx3rOdISKYlEIP0cilM192iVEI7CctOkelgHGCu00kjsoaGz3
+  webhook-secret: whsec_3efb63c2bd327e87f6540d5ed9fbb754477b18c071858c8e0e1b6a4ae35c0db8
+  payment-confirmation.url: http://localhost:8080/payment/confirmation

@@ -37,17 +37,6 @@ public class OrderService {
         return orderRepository.save(OrderMapper.toEntity(evt));
     }
 
-//    @Transactional
-//    public void updatePriceBySku(OrderPriceUpdate evt) {
-//        Optional<OrderEntity> order = orderRepository.findById(evt.orderId());
-//
-//        order.ifPresent(it -> {
-//            it.applyUnitPriceAndTotalAmount(evt.priceBySkus());
-//            //force to send to OrderDomainEventListener
-//            orderRepository.save(it);
-//        });
-//    }
-
     @Transactional
     public void orderReserved(ConfirmationReservation evt) {
         Optional<Order> order = orderRepository.findById(evt.orderId());

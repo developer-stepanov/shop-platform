@@ -6,7 +6,6 @@ import com.stepanov.enums.OrderStatus;
 
 import com.stepanov.kafka.events.topics.orders.*;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
-import com.stepanov.kafka.events.topics.stock.OrderPriceUpdate;
 import com.stepanov.kafka.events.topics.stock.PaymentDetails;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
@@ -96,27 +95,6 @@ import java.util.*;
         item.setOrderEntity(this);
     }
 
-    public void applyUnitPriceAndTotalAmount(List<OrderPriceUpdate.PriceBySku> priceBySkus) {
-
-        this.items.forEach(it -> {
-            final String sku = it.getSku();
-            final BigDecimal unitPrice = priceBySkus.stream()
-                                                    .filter(p -> sku.equals(p.sku())).findFirst()
-                                                    .orElseThrow()
-                                                .unitPrice();
-            it.setUnitPrice(unitPrice);
-        });
-
-        this.totalAmount = this.items.stream()
-                                        .map(OrderItem::getUnitPrice)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        registerEvent(OrderTotalAmountUpdated.builder()
-                            .orderId(this.id)
-                            .totalAmount(this.totalAmount.longValue())
-                            .build());
-    }
-
     public void applyReservedStatus(ConfirmationReservation evt) {
 
         if (evt.orderStatus() == OrderStatus.RESERVED) {
@@ -173,9 +151,6 @@ import java.util.*;
                                         .details(this.cancelReason)
                                         .build());
         }
-
-        // throw exception order is already in status cancelled
-
     }
 
     public void applyPaymentLink(String paymentLink) {

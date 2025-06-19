@@ -14,6 +14,26 @@ import java.util.Map;
 
 import static com.stepanov.kafka.topics.KafkaTopics.STOCK_PRODUCT_SYNC_TOPIC;
 
+/**
+ * Listens to the stock-sync topic and forwards every domain event to all
+ * WebSocket clients that are subscribed to <code>/topic/events</code>.
+ *
+ * <p>The listener is annotated with {@link KafkaListener @KafkaListener},
+ * while each overloaded {@code on(…)} method is an individual
+ * {@link KafkaHandler @KafkaHandler}.  Spring Kafka dispatches the incoming
+ * message to the handler whose parameter type matches the event payload.</p>
+ *
+ * <h2>Forwarding rules</h2>
+ * <ul>
+ *   <li><strong>Destination:</strong> {@code /topic/events}</li>
+ *   <li><strong>Headers:</strong> Every outbound message carries a single
+ *       header {@code event-type = <simple class name>} so that the
+ *       front-end can switch on the event without inspecting the body.</li>
+ * </ul>
+ *
+ * @author Maxim Stepanov
+ */
+
 @Service
 @AllArgsConstructor
 @KafkaListener(topics = STOCK_PRODUCT_SYNC_TOPIC)

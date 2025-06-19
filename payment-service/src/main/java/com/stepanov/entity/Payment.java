@@ -6,8 +6,19 @@ import com.stepanov.enums.PaymentStatus;
 import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink;
 import com.stepanov.kafka.events.topics.payments.PaymentSuccessful;
 import com.stripe.model.checkout.Session;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
@@ -17,9 +28,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "payments")
-@Getter @Setter
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class Payment extends AbstractAggregateRoot<Payment> {
 
     @Id

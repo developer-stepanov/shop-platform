@@ -1,7 +1,13 @@
 package com.stepanov.scheduler;
 
 import lombok.AllArgsConstructor;
-import org.quartz.*;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

@@ -2,14 +2,20 @@ package com.stepanov.entity;
 
 import com.stepanov.enums.Currency;
 import com.stepanov.kafka.events.topics.stock.StockItemUpdateQty;
-import jakarta.persistence.*;
-import org.hibernate.annotations.UuidGenerator;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.math.BigDecimal;
@@ -58,7 +64,8 @@ public class StockItem extends AbstractAggregateRoot<StockItem>  {
         createdAt = updatedAt = Instant.now();
     }
 
-    @PreUpdate void onUpdate() {
+    @PreUpdate
+    void onUpdate() {
         updatedAt = Instant.now();
     }
 

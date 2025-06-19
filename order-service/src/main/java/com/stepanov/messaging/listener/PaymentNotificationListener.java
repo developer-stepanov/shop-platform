@@ -13,7 +13,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-import static com.stepanov.kafka.topics.KafkaTopics.*;
+import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_NOTIFICATION_TOPIC;
 
 @Service
 @AllArgsConstructor

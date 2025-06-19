@@ -1,14 +1,15 @@
 package com.stepanov.messaging.publisher;
 
-import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
+import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.kafka.events.topics.stock.StockItemUpdateQty;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import static com.stepanov.kafka.topics.KafkaTopics.*;
+import static com.stepanov.kafka.topics.KafkaTopics.STOCK_PRODUCT_SYNC_TOPIC;
+import static com.stepanov.kafka.topics.KafkaTopics.STOCK_RESERVATION_STATUS_TOPIC;
 
 @Component
 @AllArgsConstructor

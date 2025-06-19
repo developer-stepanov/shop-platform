@@ -6,6 +6,33 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+/**
+ * Spring configuration that enables a simple STOMP broker for the
+ * gateway service.
+ *
+ * <p>Routing rules:</p>
+ * <ul>
+ *   <li><strong>Inbound (client → server):</strong> messages are sent to
+ *       destinations starting with {@code /app/**}.  These are handled by the
+ *       {@code @MessageMapping} methods in {@code WsController}.</li>
+ *   <li><strong>Outbound (server → clients):</strong> messages that the
+ *       application publishes to {@code /topic/**} are broadcast by the broker
+ *       to all subscribed clients.</li>
+ * </ul>
+ *
+ * <h2>Endpoint</h2>
+ * <p>The browser (or SockJS fallback) connects to
+ * <code>ws://&lt;host&gt;:&lt;port&gt;/ws</code>.
+ * In development that defaults to <code>ws://localhost:8080/ws</code>.</p>
+ *
+ * <h2>Security note</h2>
+ * <p>{@code setAllowedOriginPatterns("*")} is convenient during development
+ * but should be narrowed down (or replaced with CORS rules in Spring Security)
+ * for production deployments.</p>
+ *
+ * @author  Maxim Stepanov
+ */
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WsConfiguration implements WebSocketMessageBrokerConfigurer {

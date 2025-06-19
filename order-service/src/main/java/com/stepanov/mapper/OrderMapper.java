@@ -1,11 +1,13 @@
 package com.stepanov.mapper;
 
 import com.stepanov.entity.Order;
-
 import com.stepanov.entity.OrderItem;
 import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
-import com.stepanov.kafka.events.topics.orders.*;
+import com.stepanov.kafka.events.topics.orders.CreateOrder;
+import com.stepanov.kafka.events.topics.orders.OrderAccepted;
+import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.orders.OrderTableItem;
 
 import java.math.BigDecimal;
 import java.util.List;

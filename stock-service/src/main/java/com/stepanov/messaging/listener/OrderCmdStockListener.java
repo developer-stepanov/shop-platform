@@ -12,7 +12,7 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import static com.stepanov.kafka.topics.KafkaTopics.*;
+import static com.stepanov.kafka.topics.KafkaTopics.ORDER_COMMAND_STOCK_TOPIC;
 
 @Component
 @AllArgsConstructor

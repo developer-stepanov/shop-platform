@@ -1,36 +1,39 @@
 package com.stepanov.entity;
 
-import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.Currency;
+import com.stepanov.enums.OrderDetails;
 import com.stepanov.enums.OrderStatus;
-
-import com.stepanov.kafka.events.topics.orders.*;
+import com.stepanov.kafka.events.topics.orders.OrderCancelled;
+import com.stepanov.kafka.events.topics.orders.OrderPaid;
+import com.stepanov.kafka.events.topics.orders.OrderPaymentLinkUpdate;
+import com.stepanov.kafka.events.topics.orders.OrderTotalAmountUpdated;
+import com.stepanov.kafka.events.topics.orders.PayUntil;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.kafka.events.topics.stock.PaymentDetails;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")

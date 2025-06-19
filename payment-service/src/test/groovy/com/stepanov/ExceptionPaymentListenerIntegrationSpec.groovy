@@ -48,7 +48,7 @@ class ExceptionPaymentListenerIntegrationSpec extends AbstractIntegrationTests {
             var evt = validEvent()
         when: 'the payment listener processes the event'
             paymentListener.on(evt, evt.orderId().toString())
-        and: 'we attempt to consume from the prepare-payment topic'
+        and: 'we attempt to consume from the PAYMENT_NOTIFICATION_TOPIC'
             var checkoutPaymentLinkConsumerRecord =
                     KafkaTestUtils.getSingleRecord(consumer, PAYMENT_NOTIFICATION_TOPIC)
         then: 'an EmptyStripeSession is thrown with the expected message'
@@ -56,7 +56,7 @@ class ExceptionPaymentListenerIntegrationSpec extends AbstractIntegrationTests {
             ex.message == "OrderId: ${ORDER_ID}"
         and: 'no Payment entity has been persisted'
             paymentRepository.count() == 0
-        and: 'no event sent to PAYMENT_NOTIFICATION_TOPIC'
+        and: 'no event sent to the PAYMENT_NOTIFICATION_TOPIC'
             checkoutPaymentLinkConsumerRecord == null
     }
 

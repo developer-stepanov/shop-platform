@@ -24,6 +24,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
+    testImplementation 'io.github.hakky54:logcaptor:2.11.0'
+
     runtimeOnly 'com.h2database:h2'
 }
 

@@ -3,6 +3,7 @@ package com.stepanov.messaging.listener;
 import com.stepanov.kafka.events.topics.stock.ItemsForSell;
 import com.stepanov.kafka.events.topics.stock.StockItemUpdateQty;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -42,20 +43,20 @@ public class ProductSyncListener {
     private final SimpMessagingTemplate broker;
 
     @KafkaHandler
-    void on(ItemsForSell evt) {
+    void on(@NonNull ItemsForSell evt) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(StockItemUpdateQty evt, @Header(KafkaHeaders.RECEIVED_KEY) String sku) {
+    void on(@NonNull StockItemUpdateQty evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String sku) {
         send(evt);
     }
 
-    private static Map<String, Object> mapHeaders(String className) {
+    private static Map<String, Object> mapHeaders(@NonNull String className) {
         return Map.of("event-type", className);
     }
 
-    private void send(Object payload) {
+    private void send(@NonNull Object payload) {
         final String destination = "/topic/events";
         broker.convertAndSend(destination, payload, mapHeaders(payload.getClass().getSimpleName()));
     }

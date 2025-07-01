@@ -3,6 +3,7 @@ package com.stepanov.messaging.listener;
 import com.stepanov.kafka.events.topics.stock.ItemsForSellCmd;
 import com.stepanov.service.StockService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -19,7 +20,7 @@ public class GatewayCmdStockListener {
     private final StockService stockService;
 
     @KafkaHandler
-    public void on(ItemsForSellCmd evt) {
+    public void on(@NonNull ItemsForSellCmd evt) {
         stockService.itemsForSell();
     }
 

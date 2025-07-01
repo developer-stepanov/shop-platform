@@ -2,7 +2,7 @@ package com.stepanov
 
 import com.stepanov.enums.Currency
 import com.stepanov.enums.OrderStatus
-import com.stepanov.exceptions.EmptyStripeSession
+import com.stepanov.exceptions.PaymentStripeException
 import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation
 import com.stepanov.kafka.events.topics.stock.PaymentDetails
@@ -21,11 +21,15 @@ import static com.stepanov.kafka.topics.KafkaTopics.PAYMENT_NOTIFICATION_TOPIC
 
 @EmbeddedKafka(kraft = true, partitions = 1, topics = [ORDER_PREPARE_PAYMENT_TOPIC,
                                                         PAYMENT_NOTIFICATION_TOPIC])
-//exception triggered because property not set up
+//exception triggered because stripe 'successful_url' property not set up
 @SpringBootTest(properties = "stripe.payment-confirmation.url=")
 class ExceptionPaymentListenerIntegrationSpec extends AbstractIntegrationTests {
 
     static final String ORDER_ID = '7f000001-976a-1676-8197-6ac852ab0001'
+
+    static final String SKU = 'SKU-1000'
+
+    static final BigDecimal UNIT_PRICE = 1000
 
     @Autowired
     PaymentListener paymentListener
@@ -52,8 +56,9 @@ class ExceptionPaymentListenerIntegrationSpec extends AbstractIntegrationTests {
             var checkoutPaymentLinkConsumerRecord =
                     KafkaTestUtils.getSingleRecord(consumer, PAYMENT_NOTIFICATION_TOPIC)
         then: 'an EmptyStripeSession is thrown with the expected message'
-            var ex = thrown EmptyStripeSession
-            ex.message == "OrderId: ${ORDER_ID}"
+            var ex = thrown PaymentStripeException
+        and: 'message exception contains valid error message for PaymentStripeException'
+            ex.message.contains('Error during creating Stripe payment session!')
         and: 'no Payment entity has been persisted'
             paymentRepository.count() == 0
         and: 'no event sent to the PAYMENT_NOTIFICATION_TOPIC'
@@ -64,9 +69,8 @@ class ExceptionPaymentListenerIntegrationSpec extends AbstractIntegrationTests {
         ConfirmationReservation.builder()
                 .orderId(UUID.fromString(ORDER_ID))
                 .orderStatus(OrderStatus.RESERVED)
-                .paymentDetails(
-                    PaymentDetails.builder()
-                            .totalPayment(BigDecimal.valueOf(1000))
-                            .currency(Currency.EUR).build()).build()
+                .paymentDetails(new PaymentDetails(UNIT_PRICE, Currency.EUR))
+                .unitPrices(List.of(new ConfirmationReservation.UnitPrice(SKU, UNIT_PRICE)))
+                .build()
     }
 }

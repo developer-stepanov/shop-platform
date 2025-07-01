@@ -12,6 +12,6 @@ public record ConfirmationReservation(UUID orderId,
                                       OrderStatus orderStatus,
                                       PaymentDetails paymentDetails,
                                       List<UnitPrice> unitPrices) {
-    @Builder
+
     public record UnitPrice(String sku, BigDecimal unitPrice) {}
 }

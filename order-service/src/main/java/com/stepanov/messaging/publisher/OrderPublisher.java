@@ -11,6 +11,7 @@ import com.stepanov.kafka.events.topics.orders.OrderTotalAmountUpdated;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,43 +27,43 @@ public class OrderPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publish(OrderForStock evt) {
+    public void publish(@NonNull OrderForStock evt) {
         kafkaTemplate.send(ORDER_COMMAND_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(StockRelease evt) {
+    public void publish(@NonNull StockRelease evt) {
         kafkaTemplate.send(ORDER_COMMAND_STOCK_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(ConfirmationReservation evt) {
+    public void publish(@NonNull ConfirmationReservation evt) {
         kafkaTemplate.send(ORDER_PREPARE_PAYMENT_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(List<OrderTableItem> evt) {
+    public void publish(@NonNull List<OrderTableItem> evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt);
     }
 
-    public void publish(OrderAccepted evt) {
+    public void publish(@NonNull OrderAccepted evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(OrderTotalAmountUpdated evt) {
+    public void publish(@NonNull OrderTotalAmountUpdated evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(OrderReserved evt) {
+    public void publish(@NonNull OrderReserved evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(OrderCancelled evt) {
+    public void publish(@NonNull OrderCancelled evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(OrderPaymentLinkUpdate evt) {
+    public void publish(@NonNull OrderPaymentLinkUpdate evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 
-    public void publish(OrderPaid evt) {
+    public void publish(@NonNull OrderPaid evt) {
         kafkaTemplate.send(ORDER_ORDER_SYNC_TOPIC, evt.orderId().toString(), evt);
     }
 

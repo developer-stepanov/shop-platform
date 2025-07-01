@@ -4,6 +4,7 @@ import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderTableItemCmd;
 import com.stepanov.kafka.events.topics.stock.ItemsForSellCmd;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class GatewayPublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void createOrderCmd(CreateOrder evt) {
+    public void createOrderCmd(@NonNull CreateOrder evt) {
         kafkaTemplate.send(GATEWAY_COMMAND_ORDER_TOPIC, evt);
     }
 

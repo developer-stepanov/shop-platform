@@ -8,13 +8,14 @@ import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderAccepted;
 import com.stepanov.kafka.events.topics.orders.OrderForStock;
 import com.stepanov.kafka.events.topics.orders.OrderTableItem;
+import lombok.NonNull;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class OrderMapper {
 
-    public static List<OrderTableItem> fromEntity(List<Order> orders) {
+    public static List<OrderTableItem> fromEntity(@NonNull List<Order> orders) {
         return orders.stream()
                 .map(o -> OrderTableItem.builder()
                             .orderId(o.getId())
@@ -32,9 +33,9 @@ public class OrderMapper {
                 .toList();
     }
 
-    public static Order toEntity(CreateOrder event) {
+    public static Order toEntity(@NonNull CreateOrder event) {
 
-        Order orderEntity = Order.builder()
+        final Order orderEntity = Order.builder()
                         .status(OrderStatus.CREATED)
                         .totalAmount(BigDecimal.ZERO)
                         .currency(Currency.EUR)
@@ -53,7 +54,7 @@ public class OrderMapper {
         return orderEntity;
     }
 
-    public static OrderAccepted toOrderAccepted(Order orderEntity) {
+    public static OrderAccepted toOrderAccepted(@NonNull Order orderEntity) {
         return OrderAccepted.builder()
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()
@@ -66,7 +67,7 @@ public class OrderMapper {
                 .build();
     }
 
-    public static OrderForStock toOrderForStock(Order orderEntity) {
+    public static OrderForStock toOrderForStock(@NonNull Order orderEntity) {
         return OrderForStock.builder()
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()

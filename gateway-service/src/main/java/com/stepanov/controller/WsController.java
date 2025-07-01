@@ -4,6 +4,7 @@ import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderItem;
 import com.stepanov.messaging.publisher.GatewayPublisher;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
@@ -38,7 +39,7 @@ public class WsController {
     private final GatewayPublisher publisher;
 
     @MessageMapping("/make-order")
-    public void createOrder(List<OrderItem> orderItems) {
+    public void createOrder(@NonNull List<OrderItem> orderItems) {
         publisher.createOrderCmd(CreateOrder.builder().orderItems(orderItems).build());
     }
 

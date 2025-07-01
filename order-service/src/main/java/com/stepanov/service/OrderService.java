@@ -11,6 +11,8 @@ import com.stepanov.kafka.events.topics.stock.OutOfStock;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.repository.OrderRepository;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class OrderService {
 
     private static final long GAP_TO_PAY_MINUTES = 5;
@@ -33,51 +36,65 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(CreateOrder evt) {
-        return orderRepository.save(OrderMapper.toEntity(evt));
+    public Order createOrder(@NonNull CreateOrder evt) {
+        final Order order = orderRepository.save(OrderMapper.toEntity(evt));
+        log.info("Order, id: [{}] created for customer, id: [{}].", order.getId(),
+                                                          order.getCustomerId());
+        return order;
     }
 
     @Transactional
-    public void orderReserved(ConfirmationReservation evt) {
-        Optional<Order> order = orderRepository.findById(evt.orderId());
-        order.ifPresent(it -> {
-            // fire OrderReserved
+    public void orderReserved(@NonNull ConfirmationReservation evt) {
+        final Optional<Order> order = orderRepository.findById(evt.orderId());
+        order.ifPresentOrElse(it -> {
             it.applyReservedStatus(evt);
-            //fire PayUntil
             it.applyPayUntilTime(resolvePayUntilTime());
-            //force to send to OrderDomainEventListener
             orderRepository.save(it);
-        });
+
+            log.info("Order [{}] reserved with status [{}]. Pay until: [{}]", it.getId(),
+                                                                              it.getStatus(),
+                                                                              it.getPayUntil());
+        }, () -> log.warn("Received reservation event for missing order, id: [{}]. Event: {}", evt.orderId(),
+                                                                                          evt));
     }
 
     @Transactional
-    public void orderOutOfStock(OutOfStock evt) {
-        Optional<Order> order = orderRepository.findById((evt.orderId()));
-        order.ifPresent(it -> {
+    public void orderOutOfStock(@NonNull OutOfStock evt) {
+        final Optional<Order> order = orderRepository.findById((evt.orderId()));
+        order.ifPresentOrElse(it -> {
             it.applyCanceledStatus(OrderDetails.OUT_OF_STOCK);
             //force to send to OrderDomainEventListener
             orderRepository.save(it);
-        });
+
+            log.info("Order [{}] canceled with reason [{}].", it.getId(),
+                                                              OrderDetails.OUT_OF_STOCK);
+        }, () -> log.warn("Received out-of-stock event for missing order, id: [{}]. Event: {}", evt.orderId(),
+                                                                                           evt));
     }
 
     @Transactional
-    public void paymentLink(CheckoutPaymentLink evt) {
-        Optional<Order> order = orderRepository.findById(evt.orderId());
-
-        order.ifPresent(it -> {
+    public void paymentLink(@NonNull CheckoutPaymentLink evt) {
+        final Optional<Order> order = orderRepository.findById(evt.orderId());
+        order.ifPresentOrElse(it -> {
             it.applyPaymentLink(evt.checkoutUrl());
             orderRepository.save(it);
-        });
+
+            log.info("Added payment link for order [{}]: {}", it.getId(),
+                                                              evt.checkoutUrl());
+        }, () -> log.warn("Payment link event for non-existent order, id: [{}]. Event: {}", evt.orderId(),
+                                                                                            evt));
     }
 
     @Transactional
-    public void orderPaymentSucceeded(PaymentSuccessful evt) {
-        Optional<Order> order = orderRepository.findById(evt.orderId());
-
-        order.ifPresent(it -> {
+    public void orderPaymentSucceeded(@NonNull PaymentSuccessful evt) {
+        final Optional<Order> order = orderRepository.findById(evt.orderId());
+        order.ifPresentOrElse(it -> {
             it.applyPaidStatus();
             orderRepository.save(it);
-        });
+
+            log.info("Marked order [{}] as paid.", it.getId());
+        }, () -> log.warn("Payment success event for non-existent order, id: [{}]. Event: {}", evt.orderId(),
+                                                                                               evt));
     }
 
     private static Instant resolvePayUntilTime() {

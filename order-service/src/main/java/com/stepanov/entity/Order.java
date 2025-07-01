@@ -120,10 +120,7 @@ import java.util.UUID;
             registerEvent(ConfirmationReservation.builder()
                                         .orderId(this.id)
                                         .orderStatus(this.status)
-                                        .paymentDetails(PaymentDetails.builder()
-                                                .totalPayment(this.totalAmount)
-                                                .currency(this.currency)
-                                                .build())
+                                        .paymentDetails(new PaymentDetails(this.totalAmount, this.currency))
                                         .build());
 
             registerEvent(OrderTotalAmountUpdated.builder()

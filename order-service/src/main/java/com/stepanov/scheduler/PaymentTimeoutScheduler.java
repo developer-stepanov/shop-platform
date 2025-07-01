@@ -1,6 +1,7 @@
 package com.stepanov.scheduler;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -24,15 +25,15 @@ public class PaymentTimeoutScheduler {
 
     private final Scheduler scheduler;
 
-    public void schedulePaymentTimeoutJob(UUID orderId, Instant payUntil) throws SchedulerException {
-        JobKey jobKey = resolveJobKey(orderId);
+    public void schedulePaymentTimeoutJob(@NonNull UUID orderId, @NonNull Instant payUntil) throws SchedulerException {
+        final JobKey jobKey = resolveJobKey(orderId);
 
-        Trigger trigger = TriggerBuilder.newTrigger()
+        final Trigger trigger = TriggerBuilder.newTrigger()
                                         .forJob(jobKey)
                                         .startAt(Date.from(payUntil))
                                         .build();
 
-        JobDetail jobDetail = JobBuilder.newJob(PaymentTimeoutJob.class)
+        final JobDetail jobDetail = JobBuilder.newJob(PaymentTimeoutJob.class)
                 .withIdentity(jobKey)
                 .usingJobData(ORDER_ID_JOB_KEY, orderId.toString())
                 .storeDurably()
@@ -42,11 +43,11 @@ public class PaymentTimeoutScheduler {
 
     }
 
-    public void deleteJobBy(UUID orderId) throws SchedulerException {
+    public void deleteJobBy(@NonNull UUID orderId) throws SchedulerException {
         scheduler.deleteJob(resolveJobKey(orderId));
     }
 
-    private static JobKey resolveJobKey(UUID orderId) {
+    private static JobKey resolveJobKey(@NonNull UUID orderId) {
         return JobKey.jobKey(String.format("%s_%s", PAYMENT_TIMEOUT_KEY, orderId));
     }
 

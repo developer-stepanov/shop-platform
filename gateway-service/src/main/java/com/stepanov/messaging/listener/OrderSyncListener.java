@@ -8,6 +8,7 @@ import com.stepanov.kafka.events.topics.orders.OrderReserved;
 import com.stepanov.kafka.events.topics.orders.OrderTableItem;
 import com.stepanov.kafka.events.topics.orders.OrderTotalAmountUpdated;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -48,45 +49,45 @@ public class OrderSyncListener {
     private final SimpMessagingTemplate broker;
 
     @KafkaHandler
-    void on(List<OrderTableItem> evt) {
+    void on(@NonNull List<OrderTableItem> evt) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderAccepted evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderAccepted evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderTotalAmountUpdated evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderTotalAmountUpdated evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderReserved evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderReserved evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderCancelled evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderCancelled evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderPaymentLinkUpdate evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderPaymentLinkUpdate evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
     @KafkaHandler
-    void on(OrderPaid evt, @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
+    void on(@NonNull OrderPaid evt, @NonNull @Header(KafkaHeaders.RECEIVED_KEY) String orderId) {
         send(evt);
     }
 
-    private static Map<String, Object> mapHeaders(String className) {
+    private static Map<String, Object> mapHeaders(@NonNull String className) {
         return Map.of("event-type", className);
     }
 
-    private void send(Object payload) {
+    private void send(@NonNull Object payload) {
         final String destination = "/topic/events";
         broker.convertAndSend(destination, payload, mapHeaders(payload.getClass().getSimpleName()));
     }

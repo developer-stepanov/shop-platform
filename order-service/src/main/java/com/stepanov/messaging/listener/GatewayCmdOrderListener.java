@@ -9,6 +9,7 @@ import com.stepanov.mapper.OrderMapper;
 import com.stepanov.messaging.publisher.OrderPublisher;
 import com.stepanov.service.OrderService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -25,16 +26,16 @@ public class GatewayCmdOrderListener {
     private final OrderService orderService;
 
     @KafkaHandler
-    void on(OrderTableItemCmd evt) {
+    void on(@NonNull OrderTableItemCmd evt) {
         publisher.publish(orderService.fetchOrderItems());
     }
 
     @KafkaHandler
-    public void on(CreateOrder evt) {
-        Order savedOrder = orderService.createOrder(evt);
+    public void on(@NonNull CreateOrder evt) {
+        final Order savedOrder = orderService.createOrder(evt);
 
-        OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
-        OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
+        final OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
+        final OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
 
         publisher.publish(orderAccepted);
         publisher.publish(orderForStock);

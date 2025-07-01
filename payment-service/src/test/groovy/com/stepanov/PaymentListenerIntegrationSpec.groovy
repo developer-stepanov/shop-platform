@@ -1,5 +1,6 @@
 package com.stepanov
 
+import com.stepanov.entity.Payment
 import com.stepanov.enums.Currency
 import com.stepanov.enums.OrderStatus
 import com.stepanov.kafka.events.topics.payments.CheckoutPaymentLink
@@ -7,6 +8,7 @@ import com.stepanov.kafka.events.topics.stock.ConfirmationReservation
 import com.stepanov.kafka.events.topics.stock.PaymentDetails
 import com.stepanov.messaging.listener.PaymentListener
 import com.stepanov.repository.PaymentRepository
+import nl.altindag.log.LogCaptor
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +26,12 @@ class PaymentListenerIntegrationSpec extends AbstractIntegrationTests {
 
     final String ORDER_ID = '9f000021-976a-1676-8197-6ac852ab0001'
 
+    static final String SKU = 'SKU-1000'
+
+    static final BigDecimal UNIT_PRICE = 1000
+
+    LogCaptor logCaptor
+
     @Autowired
     PaymentListener paymentListener
 
@@ -36,6 +44,7 @@ class PaymentListenerIntegrationSpec extends AbstractIntegrationTests {
     Consumer<String, CheckoutPaymentLink> consumer
 
     void setup() {
+        logCaptor = LogCaptor.forClass(PaymentListener)
         consumer = consumerFactory.createConsumer()
         consumer.assign([new TopicPartition(PAYMENT_NOTIFICATION_TOPIC, 0)])
     }
@@ -60,15 +69,21 @@ class PaymentListenerIntegrationSpec extends AbstractIntegrationTests {
                 orderId().toString() == ORDER_ID
                 checkoutUrl()
             }
+        and: "valid log from ${PaymentListener} logged"
+            Payment paymentItem = paymentRepository.findAll().first()
+            logCaptor.infoLogs.any {
+                "Prepared payment [${paymentItem.id}] " +
+                    "for order [${evt.orderId()}], " +
+                    "Stripe session [${paymentItem.stripeSessionId}] created."
+            }
     }
 
     private ConfirmationReservation validEvent() {
         ConfirmationReservation.builder()
                 .orderId(UUID.fromString(ORDER_ID))
                 .orderStatus(OrderStatus.RESERVED)
-                .paymentDetails(
-                    PaymentDetails.builder()
-                            .totalPayment(BigDecimal.valueOf(1000))
-                            .currency(Currency.EUR).build()).build()
+                .paymentDetails(new PaymentDetails(UNIT_PRICE, Currency.EUR))
+                .unitPrices(List.of(new ConfirmationReservation.UnitPrice(SKU, UNIT_PRICE)))
+                .build()
     }
 }

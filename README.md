@@ -15,6 +15,7 @@ sequenceDiagram
     participant SS as Stock Service
     participant OS as Order Service
     participant PS as Payment Service
+    participant ST as Stripe Service
     participant DB as Database(s)
 
     %% ---------------- 1. Catalogue ----------------
@@ -29,7 +30,7 @@ sequenceDiagram
 
     %% ---------------- 2. Create Order ----------------
     Note over U,FE: Create order
-    U ->> FE: Clicks "MAKE ORDER"
+    U ->> FE: Clicks “Checkout”
     FE ->> GW: /app/make-order (OrderItems)
     GW ->> K: CreateOrder cmd
     K  ->> OS: CreateOrder cmd
@@ -42,18 +43,24 @@ sequenceDiagram
         SS -->> OS: ConfirmationReservation
         OS ->> DB: Update Order → RESERVED
         OS -->> PS: InitiatePayment(orderId, amount)
+        PS ->> ST: CreateCheckoutSession
+        ST -->> PS: CheckoutSession(checkoutUrl)
         PS -->> OS: CheckoutPaymentLink(checkoutUrl)
         OS ->> DB: Update Order → AWAIT_PAYMENT
         OS ->> K: CheckoutPaymentLink evt
         K  ->> GW: CheckoutPaymentLink evt
         GW ->> FE: /topic/events (checkoutUrl)
-        U  ->> PS: Completes payment (Stripe)
+        FE ->> U: Render PAY button
+        U  ->> ST: Redirect to Stripe checkoutUrl
+        ST -->> U: Redirect back to FE (returnUrl)
+        ST ->> PS: payment_intent.succeeded (webhook)
         PS ->> K: PaymentSuccessful evt
         K  ->> OS: PaymentSuccessful
         OS ->> DB: Update Order → PAID
         OS ->> K: OrderUpdated evt
         K  ->> GW: OrderUpdated evt
         GW ->> FE: /topic/events (status=PAID)
+    %% --- Highlight Out-of-stock path ---
     else Out of stock
         SS -->> OS: OutOfStock
         OS ->> DB: Update Order → CANCELED
@@ -61,6 +68,7 @@ sequenceDiagram
         K  ->> GW: OutOfStock evt
         GW ->> FE: /topic/events (out‑of‑stock)
     end
+    %% --- End highlight ---
 ```
 
 _Re-render this diagram automatically on GitHub, GitLab, or any viewer that supports Mermaid._

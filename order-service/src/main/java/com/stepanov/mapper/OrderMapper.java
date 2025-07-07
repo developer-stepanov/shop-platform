@@ -6,8 +6,8 @@ import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderAccepted;
-import com.stepanov.kafka.events.topics.orders.OrderForStock;
 import com.stepanov.kafka.events.topics.orders.OrderTableItem;
+import com.stepanov.kafka.events.topics.orders.ReserveStock;
 import lombok.NonNull;
 
 import java.math.BigDecimal;
@@ -67,8 +67,8 @@ public class OrderMapper {
                 .build();
     }
 
-    public static OrderForStock toOrderForStock(@NonNull Order orderEntity) {
-        return OrderForStock.builder()
+    public static ReserveStock toReserveStock(@NonNull Order orderEntity) {
+        return ReserveStock.builder()
                 .orderId(orderEntity.getId())
                 .orderItems(orderEntity.getItems().stream()
                         .map(it -> com.stepanov.kafka.events.topics.orders.OrderItem.builder()

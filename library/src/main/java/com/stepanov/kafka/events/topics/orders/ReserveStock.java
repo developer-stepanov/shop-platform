@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record OrderForStock(
+public record ReserveStock(
         UUID orderId,
         List<OrderItem> orderItems) {}

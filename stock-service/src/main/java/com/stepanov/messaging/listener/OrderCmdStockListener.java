@@ -1,6 +1,6 @@
 package com.stepanov.messaging.listener;
 
-import com.stepanov.kafka.events.topics.orders.OrderForStock;
+import com.stepanov.kafka.events.topics.orders.ReserveStock;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
 import com.stepanov.service.StockService;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class OrderCmdStockListener {
     private final StockService stockService;
 
     @KafkaHandler
-    public void on(@NonNull OrderForStock evt) {
+    public void on(@NonNull ReserveStock evt) {
         stockService.reserveBy(evt);
     }
 

@@ -47,7 +47,7 @@ public class OrderService {
     public void orderReserved(@NonNull ConfirmationReservation evt) {
         final Optional<Order> order = orderRepository.findById(evt.orderId());
         order.ifPresentOrElse(it -> {
-            it.applyReservedStatus(evt);
+            it.applyReservedStatusAndTotalAmount(evt);
             it.applyPayUntilTime(resolvePayUntilTime());
             orderRepository.save(it);
 

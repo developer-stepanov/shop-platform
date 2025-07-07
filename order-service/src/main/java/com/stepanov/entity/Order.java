@@ -98,7 +98,7 @@ import java.util.UUID;
         item.setOrderEntity(this);
     }
 
-    public void applyReservedStatus(ConfirmationReservation evt) {
+    public void applyReservedStatusAndTotalAmount(ConfirmationReservation evt) {
 
         if (evt.orderStatus() == OrderStatus.RESERVED) {
             this.status = evt.orderStatus();

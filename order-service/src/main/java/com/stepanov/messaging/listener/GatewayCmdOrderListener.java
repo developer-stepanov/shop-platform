@@ -3,8 +3,8 @@ package com.stepanov.messaging.listener;
 import com.stepanov.entity.Order;
 import com.stepanov.kafka.events.topics.orders.CreateOrder;
 import com.stepanov.kafka.events.topics.orders.OrderAccepted;
-import com.stepanov.kafka.events.topics.orders.OrderForStock;
 import com.stepanov.kafka.events.topics.orders.OrderTableItemCmd;
+import com.stepanov.kafka.events.topics.orders.ReserveStock;
 import com.stepanov.mapper.OrderMapper;
 import com.stepanov.messaging.publisher.OrderPublisher;
 import com.stepanov.service.OrderService;
@@ -35,10 +35,10 @@ public class GatewayCmdOrderListener {
         final Order savedOrder = orderService.createOrder(evt);
 
         final OrderAccepted orderAccepted = OrderMapper.toOrderAccepted(savedOrder);
-        final OrderForStock orderForStock = OrderMapper.toOrderForStock(savedOrder);
+        final ReserveStock reserveStock = OrderMapper.toReserveStock(savedOrder);
 
         publisher.publish(orderAccepted);
-        publisher.publish(orderForStock);
+        publisher.publish(reserveStock);
     }
 
 }

@@ -6,8 +6,8 @@ import com.stepanov.enums.Currency;
 import com.stepanov.enums.OrderStatus;
 import com.stepanov.enums.ReservationStatus;
 import com.stepanov.exceptions.OutOfStockException;
-import com.stepanov.kafka.events.topics.orders.OrderForStock;
 import com.stepanov.kafka.events.topics.orders.OrderItem;
+import com.stepanov.kafka.events.topics.orders.ReserveStock;
 import com.stepanov.kafka.events.topics.orders.StockRelease;
 import com.stepanov.kafka.events.topics.stock.ConfirmationReservation;
 import com.stepanov.kafka.events.topics.stock.ItemsForSell;
@@ -53,7 +53,7 @@ public class StockService {
     }
 
     @Transactional
-    public void reserveBy(@NonNull OrderForStock evt) {
+    public void reserveBy(@NonNull ReserveStock evt) {
         final UUID orderId = evt.orderId();
         final List<ConfirmationReservation.UnitPrice> unitPrices = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public class StockService {
     }
 
     private void handleStockReservation(@NonNull OrderItem orderItem,
-                                        @NonNull OrderForStock evt,
+                                        @NonNull ReserveStock evt,
                                         @NonNull List<ConfirmationReservation.UnitPrice> unitPrices) {
 
         final StockItem stockItem = stockManager.getRequiredLockedStockItemBySku(orderItem.sku());
@@ -95,10 +95,10 @@ public class StockService {
                                                         qtyToReserve));
         }
 
-        stockItem.decreaseAvailableQty(qtyToReserve);
+        stockItem.decreaseAvailableQty(qtyToReserve); // -->> publish StockItemUpdateQty to GW
         stockRepository.save(stockItem);
 
-        saveReservation(evt.orderId(), orderItem.sku(), qtyToReserve);
+        saveReservation(evt.orderId(), orderItem.sku(), qtyToReserve); // -->>
         unitPrices.add(buildUnitPrice(stockItem));
     }
 

@@ -35,13 +35,20 @@ sequenceDiagram
     GW ->> K: CreateOrder cmd
     K  ->> OS: CreateOrder cmd
     OS ->> DB: Save Order (NEW)
+    OS ->> GW: OrderAccepted evt (UI show)
+    GW ->> FE: /topic/events (status=CREATED)
     OS ->> SS: ReserveStock(orderId, items)
 
     %% ----- 2a. Stock reserved branch -----
     alt Stock reserved
         SS ->> DB: Decrease qty / reserve
-        SS -->> OS: ConfirmationReservation
-        OS ->> DB: Update Order → RESERVED
+        SS ->> GW: StockItemUpdateQty evt (UI show)
+        GW ->> FE: /topic/events (decrease available qty by sku)
+        SS ->> OS: ConfirmationReservation evt
+        OS ->> DB: Update Order → status=RESERVED + resolve PAY_UNTIL_TIME
+        OS ->> GW: OrderReserved evt (UI show)
+        GW ->> FE: /topic/events (status=RESERVED)
+        
         OS -->> PS: InitiatePayment(orderId, amount)
         PS ->> ST: CreateCheckoutSession
         ST -->> PS: CheckoutSession(checkoutUrl)

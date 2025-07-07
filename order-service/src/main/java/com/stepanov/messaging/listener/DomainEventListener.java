@@ -27,11 +27,11 @@ public class DomainEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(@NonNull ConfirmationReservation evt) {
-        final OrderReserved orderReserved = OrderReserved.builder()
+        final OrderReserved orderReservedEvt = OrderReserved.builder()
                                             .orderId(evt.orderId())
                                             .orderStatus(OrderStatus.RESERVED)
                                             .build();
-        publisher.publish(orderReserved);
+        publisher.publish(orderReservedEvt);
         publisher.publish(evt);
     }
 

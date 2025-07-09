@@ -1,8 +1,8 @@
 # --- Stripe wiring ---
 stripe:
-  api-key: sk_test_51RIYzHRr9jDe8gOjt9XvxrEbUWkn5zAFQB8qECZ4Fw0gOHWCHWx3rOdISKYlEIP0cilM192iVEI7CctOkelgHGCu00kjsoaGz3
-  webhook-secret: whsec_3efb63c2bd327e87f6540d5ed9fbb754477b18c071858c8e0e1b6a4ae35c0db8
-  payment-confirmation.url: ${PAYMENT_CONFIRMATION_URL:http://localhost:8080/payment/confirmation}
+  api-key: ${API_KEY}
+  webhook-secret: ${WEBHOOK_SECRET}
+  payment-confirmation.url: ${PAYMENT_CONFIRMATION_URL}
 
 spring:
   application.name: payment-service

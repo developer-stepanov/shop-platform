@@ -37,6 +37,11 @@ public class StripeWebhookController {
 
     @PostMapping
     public ResponseEntity<Void> webhook(@NonNull HttpServletRequest request) throws IOException {
+        log.info("Config: \n webhook: {} \n api-key: {}, back-url: {}", config.getWebhookSecret(),
+                                                                        config.getApiKey(),
+                                                                        config.getPaymentConfirmationUrl());
+
+        log.info("Stripe request signature: {}", request.getHeader(STRIPE_SIGNATURE));
 
         final String sig = request.getHeader(STRIPE_SIGNATURE);
         final String body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);

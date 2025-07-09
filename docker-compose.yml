@@ -110,6 +110,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - API_KEY=${API_KEY}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
       - PAYMENT_CONFIRMATION_URL=http://${HOST_IP}:8080/payment/confirmation
     ports:
       - "8083:8080"

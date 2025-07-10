@@ -41,7 +41,7 @@ services:
 
 # gateway wiring
   gateway-service:
-#    image: developerstepanov/shop-platform:gateway-service-2.0.0
+#    image: developerstepanov/shop-platform:gateway-service-1.0.0
     build:
       context: ./gateway-service
       dockerfile: Dockerfile
@@ -54,7 +54,7 @@ services:
 
 # order service wiring
   order-service:
-#    image: developerstepanov/shop-platform:order-service-2.0.0
+#    image: developerstepanov/shop-platform:order-service-1.0.0
     build:
       context: ./order-service
       dockerfile: Dockerfile
@@ -79,7 +79,7 @@ services:
 
 # stock service wiring
   stock-service:
-#    image: developerstepanov/shop-platform:stock-service-2.0.0
+#    image: developerstepanov/shop-platform:stock-service-1.0.0
     build:
       context: ./stock-service
       dockerfile: Dockerfile
@@ -104,7 +104,7 @@ services:
 
 # payment service wiring
   payment-service:
-#    image: developerstepanov/shop-platform:payment-service-2.0.0
+#    image: developerstepanov/shop-platform:payment-service-1.0.0
     build:
       context: ./payment-service
       dockerfile: Dockerfile

@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Order demo – PAY button removed on Paid or Cancelled</title>
+    <title>Shop</title>
+
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
 
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
@@ -71,7 +73,7 @@
 <script>
     // ----------- CONFIG -----------
     const GET_PRODUCTS_DEST = '/app/get-product-items';
-    const GET_ORDERS_DEST   = '/app/get-order-items';   // 🔸 fetch existing orders on connect
+    const GET_ORDERS_DEST   = '/app/get-order-items';
 
     // ----------- STATE -----------
     // orderId → { clientRequestId, orderId, orderItems, price, totalAmount, orderStatus, details, paymentLink }
@@ -90,33 +92,33 @@
             try {
                 const body = JSON.parse(msg.body);
 
-                /* 1️⃣  Product list */
+                /* Product list */
                 const products = Array.isArray(body) ? body : Array.isArray(body?.items) ? body.items : null;
                 if(products?.length && products[0].sku){ renderProducts(products); }
 
-                /* 1️⃣b Order list – full snapshot returned by /get-order-items */
+                /* Order list – full snapshot returned by /get-order-items */
                 const initialOrders = Array.isArray(body) && body[0]?.orderId ? body : null;
                 if(initialOrders){ initialOrders.forEach(addOrUpdateOrder); }
 
-                /* 2️⃣  Stock update */
+                /* Stock update */
                 if(body?.sku && body.qty !== undefined && Object.keys(body).length === 2){ updateStockQty(body); }
 
-                /* 3️⃣  Paid event */
+                /* Paid event */
                 if(type === 'OrderPaid' && body.orderId){ applyOrderPaid(body); }
 
-                /* 4️⃣  Price / status / aggregate */
+                /* Price / status / aggregate */
                 if(body?.orderId){
-                    // 4a️⃣  Total amount update coming from backend (OrderTotalAmountUpdated)
+                    // Total amount update coming from backend (OrderTotalAmountUpdated)
                     if(body.totalAmount !== undefined){ applyTotalAmountUpdate(body); }
-                    // 4b️⃣  Legacy incremental price update (unitPrice × qty) – kept for backward‑compatibility
+                    // Legacy incremental price update (unitPrice × qty) – kept for backward‑compatibility
                     else if(body.unitPrice !== undefined && body.sku){ /* no‑op – deprecated */ }
-                    // 4c️⃣  Pure status change
+                    // Pure status change
                     else if(body.orderStatus && Object.keys(body).length === 2){ updateOrderStatus(body); }
-                    // 4d️⃣  Initial aggregate snapshot or other mixed payload
+                    // Initial aggregate snapshot or other mixed payload
                     else { addOrUpdateOrder(body); }
                 }
 
-                /* 5️⃣  Payment link */
+                /* Payment link */
                 if(body?.orderId && body.paymentLink){ applyPaymentLink(body); }
 
                 log(`[${type}] ${msg.body}`);
@@ -174,7 +176,7 @@
         // Merge with any existing record first
         const merged = {...(ordersIndex.get(order.orderId) || {}), ...order};
 
-        // 🔹 Ensure totalAmount is visible – map to price if price is absent
+        // Ensure totalAmount is visible – map to price if price is absent
         if(merged.price == null && merged.totalAmount != null){ merged.price = Number(merged.totalAmount); }
 
         if(merged.orderStatus?.toUpperCase() === 'CANCELLED'){ delete merged.paymentLink; }
@@ -229,7 +231,7 @@
         cells[0].textContent = order.orderId;
         cells[1].textContent = itemsStr;
 
-        // 🔹 Price / totalAmount fallback
+        // Price / totalAmount fallback
         const amount = order.price != null ? order.price : order.totalAmount;
         cells[2].textContent = amount != null ? `€ ${Number(amount).toFixed(2)}` : '';
 
@@ -238,7 +240,7 @@
     }
     function getStatusChip(status){ if(!status) return ''; const cls = (status.toLowerCase() || 'unknown')+'-status'; return `<span class="chip status-chip ${cls}">${status}</span>`; }
     function getDetailsChip(details){ if(!details) return ''; const pretty = details.replace(/_/g,' ').toLowerCase().replace(/^./,c=>c.toUpperCase()); return `<span class="chip details-chip">${pretty}</span>`; }
-    function getPayButton(link){ return link ? `<a href="${link}" target="_blank" class="waves-effect waves-light btn-small green">PAY</a>` : ''; }
+    function getPayButton(link){ return link ? `<a href="${link}" target="_blank" class="waves-effect waves-light btn-small green">PAY IN 5 MIN</a>` : ''; }
 
     /* ---------- Logger ---------- */
     function log(msg){ document.getElementById('log').textContent += msg + '\n\n'; }
